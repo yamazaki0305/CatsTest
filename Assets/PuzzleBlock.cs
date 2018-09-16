@@ -18,7 +18,8 @@ public enum BlockType
     BLOCK
 }
 
-public class PuzzleBlock : MonoBehaviour {
+public class BlockData
+{
 
     //public Sprite[]BlockSprites;
     public Sprite BlockSprite;
@@ -43,7 +44,7 @@ public class PuzzleBlock : MonoBehaviour {
         return this.blockType;
     }
     // コンストラクタでインスタンスを生成した時に情報を渡す
-    public PuzzleBlock(BlockType type, string alphabet, bool selected, int x, int y, Sprite sprite)
+    public BlockData(BlockType type, string alphabet, bool selected, int x, int y, Sprite sprite)
     {
         this.blockType = type;
         this.Alphabet = alphabet;

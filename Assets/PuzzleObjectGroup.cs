@@ -19,7 +19,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
     public GameObject [,]target = new GameObject[7, 7];
 
     // 7列のデータを作成している。このブロックのデータでゲームを制御
-    public PuzzleBlock[,] blockData = new PuzzleBlock[7, 7];
+    public BlockData[,] blockData = new BlockData[7, 7];
 
 
     // Use this for initialization
@@ -28,9 +28,11 @@ public class PuzzleObjectGroup : MonoBehaviour {
         {
             for (int j = 0; j < 7; j++)
             {
-                
+
+                int spriteId = UnityEngine.Random.Range(0, 5);
+
                 // タイプとアルファベットは固定にしています
-                blockData[i, j] = new PuzzleBlock(BlockType.ALPHABET, "A", false, i, j, puzzleSprites[0]);
+                blockData[i, j] = new BlockData(BlockType.ALPHABET, "A", false, i, j, puzzleSprites[spriteId]);
 
                 Vector2 pos = new Vector2(i*90-320+45, j*90-270);
 
@@ -42,8 +44,8 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 ball.transform.position = pos;
                 ball.transform.localScale = puzzlePrefab.transform.localScale;
 
-                int spriteId = UnityEngine.Random.Range(0, 5);
-                ball.name = "Ball" + spriteId; // GameObjectの名前を決めている
+               
+                ball.name = "Block" + spriteId; // GameObjectの名前を決めている
                 SpriteRenderer spriteObj = ball.GetComponent<SpriteRenderer>();
                 spriteObj.sprite = blockData[i, j].BlockSprite;  // GameObjectの名前を決めている
             }
