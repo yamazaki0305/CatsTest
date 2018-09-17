@@ -14,15 +14,17 @@ using UnityEngine.SceneManagement;
 public enum BlockType
 {
     INVALID = -1,
-    ALPHABET,
-    BLOCK
+    ALPHABET = 0,
+    CRIMP,
+    CAT = 4,
+    SPACE
 }
 
-public class BlockData
+public class BlockData : MonoBehaviour
 {
-
+     
     //public Sprite[]BlockSprites;
-    public Sprite BlockSprite;
+    public Sprite[] Sprites;
 
     // 並んでいるブロックのタイプを定義する。
     public BlockType blockType = BlockType.INVALID;
@@ -43,21 +45,45 @@ public class BlockData
     {
         return this.blockType;
     }
-    // コンストラクタでインスタンスを生成した時に情報を渡す
-    public BlockData(BlockType type, string alphabet, bool selected, int x, int y, Sprite sprite)
+
+    public void setup(BlockType type, string alphabet, bool selected, int x, int y)
     {
         this.blockType = type;
         this.Alphabet = alphabet;
         this.Selected = selected;
         this.X = x;
         this.Y = y;
-        this.BlockSprite = sprite;
+
+        if(this.blockType==BlockType.ALPHABET)
+        {
+            this.GetComponent<SpriteRenderer>().sprite = Sprites[(int)BlockType.ALPHABET];
+            this.GetComponentInChildren<TextMesh>().text = this.Alphabet;
+        }
+        else if(this.blockType==BlockType.CAT)
+        {
+            this.GetComponent<SpriteRenderer>().sprite = Sprites[(int)BlockType.CAT];
+            this.GetComponentInChildren<TextMesh>().text = "";
+        }
+
 
     }
+    /*
+    // コンストラクタでインスタンスを生成した時に情報を渡す
+    public BlockData(BlockType type, string alphabet, bool selected, int x, int y)
+    {
+        this.blockType = type;
+        this.Alphabet = alphabet;
+        this.Selected = selected;
+        this.X = x;
+        this.Y = y;
+        
+    }
+    */
 
     void Start()
     {
-       // this.BlockSprite = BlockSprites[0];
+        
+
         //rend = GetComponent<SpriteRenderer>();
         //rend.sprite = block[1];
         //this.transform.position = new Vector3(0, 0,0);

@@ -12,42 +12,57 @@ using UnityEngine.SceneManagement;
 
 public class PuzzleObjectGroup : MonoBehaviour {
 
+    //ステージの縦、横大きさ
+    private int Hsize = 7;
+    private int Wsize = 7;
+
     public Transform puzzleGroup;
-    public Sprite[] puzzleSprites;
+    //public Sprite[] puzzleSprites;
 
     public GameObject puzzlePrefab;
-    public GameObject [,]target = new GameObject[7, 7];
 
     // 7列のデータを作成している。このブロックのデータでゲームを制御
-    public BlockData[,] blockData = new BlockData[7, 7];
+    public GameObject[,] blockData = new GameObject[7, 7];
 
+    public string[,] stageData = new string[7, 7];
 
     // Use this for initialization
     void Start () {
-        for (int i = 0; i < 7; i++)
+
+        stageMaker();
+
+        for (int i = 0; i < Wsize; i++)
         {
-            for (int j = 0; j < 7; j++)
+            for (int j = 0; j < Hsize; j++)
             {
 
-                int spriteId = UnityEngine.Random.Range(0, 5);
+                //空白の時
+                if (stageData[i, j] != "")
+                { 
 
-                // タイプとアルファベットは固定にしています
-                blockData[i, j] = new BlockData(BlockType.ALPHABET, "A", false, i, j, puzzleSprites[spriteId]);
+                    Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
 
-                Vector2 pos = new Vector2(i*90-320+45, j*90-270);
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    blockData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
+                    if (stageData[i, j] == "cat")
+                    {
+                        blockData[i, j].GetComponent<BlockData>().setup(BlockType.CAT, stageData[i, j], false, i, j);
+                        blockData[i, j].name = "Cat"; // GameObjectの名前を決めている
 
-                // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
-                GameObject ball = Instantiate(puzzlePrefab, pos, Quaternion.identity);
+                    }
+                    else
+                    {
+                        blockData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
+                        blockData[i, j].name = "Block"; // GameObjectの名前を決めている
+                    }
 
-                // 生成した玉をグループ化
-                ball.transform.SetParent(puzzleGroup);
-                ball.transform.position = pos;
-                ball.transform.localScale = puzzlePrefab.transform.localScale;
+                    // 生成した玉をグループ化
+                    blockData[i, j].transform.SetParent(puzzleGroup);
+                    blockData[i, j].transform.position = pos;
+                    blockData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
 
-               
-                ball.name = "Block" + spriteId; // GameObjectの名前を決めている
-                SpriteRenderer spriteObj = ball.GetComponent<SpriteRenderer>();
-                spriteObj.sprite = blockData[i, j].BlockSprite;  // GameObjectの名前を決めている
+
+                }
             }
         }
 
@@ -62,12 +77,43 @@ public class PuzzleObjectGroup : MonoBehaviour {
         {
             Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Collider2D collition2d = Physics2D.OverlapPoint(point);
+
             if (collition2d)
             {
-                // ここでRayが当たったGameObjectを取得できる
-                Debug.Log(collition2d.gameObject.name);
+                if (collition2d.tag == "Block")
+                {
+                    // ここでRayが当たったGameObjectを取得できる
+                    Debug.Log(collition2d.gameObject.name);
+                    Debug.Log(collition2d.gameObject.GetComponent<BlockData>().GetType());
+                }
             }
         }
+
+    }
+
+    public void stageMaker()
+    {
+        string[] array;
+        array = new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+
+        for (int i = 0; i < Wsize; i++)
+        {
+            for (int j = 0; j < Hsize; j++)
+            {
+                int rand = UnityEngine.Random.Range(0, 26);
+                stageData[i, j] = array[rand];
+            }
+        }
+
+        //7列目を空白にする
+        for (int i = 0; i < Wsize; i++)
+        {
+            stageData[i, Hsize - 1] = "";
+        }
+        //7列目に猫を配置
+        stageData[1,Hsize - 1] ="cat";
+        stageData[3,Hsize - 1] ="cat";
+        stageData[5,Hsize - 1] ="cat";
 
     }
 }

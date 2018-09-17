@@ -42,7 +42,7 @@ GameObject:
   - component: {fileID: 114897769708576626}
   m_Layer: 0
   m_Name: BlockPrefab
-  m_TagString: Untagged
+  m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -136,12 +136,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ae842f487a5c194ebd15233f323b7fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlockSprites:
+  Sprites:
   - {fileID: 21300000, guid: 409e3db8b42878045a6e55d8a3b35533, type: 3}
   - {fileID: 21300000, guid: 6b8ccd911e25726428dcb03bb2f5c46b, type: 3}
   - {fileID: 21300000, guid: c741d4c011c75ee4781534f905667b17, type: 3}
   - {fileID: 21300000, guid: 25173d3475352364e8b25f0d8fe58c03, type: 3}
   - {fileID: 21300000, guid: 0c0f7090420dbc04b965ff2b2a99ceaf, type: 3}
+  - {fileID: 0}
   blockType: 0
   Alphabet: 
   Selected: 0
@@ -211,7 +212,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 265, y: 270}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &224921009655630148
