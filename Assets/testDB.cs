@@ -17,7 +17,7 @@ public class testDB : MonoBehaviour {
 
         SqliteDatabase sqlDB = new SqliteDatabase("default.db");
 
-        string query = "select name where dummy=1";
+        string query = "select name from example where dummy=1";
         DataTable dataTable = sqlDB.ExecuteQuery(query);
 
         foreach (DataRow dr in dataTable.Rows)
