@@ -47,7 +47,7 @@ PluginImporter:
         settings:
           CPU: x86
           DefaultValueInitialized: true
-          OS: AnyOS
+          OS: Windows
     data:
       first:
         Facebook: Win

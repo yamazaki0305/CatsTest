@@ -14,6 +14,20 @@ public class testDB : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
+        SqliteDatabase sqlDB = new SqliteDatabase("default.db");
+
+        string query = "select name where dummy=1";
+        DataTable dataTable = sqlDB.ExecuteQuery(query);
+
+        foreach (DataRow dr in dataTable.Rows)
+        {
+            name = (string)dr["name"];
+           // attack = (int)dr["attack"];
+            Debug.Log("name:" + name );
+        }
+
+        /*
         SqliteDatabase sqlDB = new SqliteDatabase("GameMaster.db");
         string query = "select name,attack from Weapon where id=2";
         DataTable dataTable = sqlDB.ExecuteQuery(query);
@@ -26,6 +40,7 @@ public class testDB : MonoBehaviour {
             attack = (int)dr["attack"];
             Debug.Log("name:" + name + " attack:" + attack);
         }
+        */
 
     }
 	
