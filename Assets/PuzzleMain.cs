@@ -84,7 +84,7 @@ public class PuzzleMain : MonoBehaviour
             GameOverObj.GetComponent<Text>().text = "GameOver!!";
             GameOverObj.SetActive(true);
         }
-        //ゲームーバー判定
+        //ゲームクリア判定
         else if (StatusData.Cat == 0)
         {
             GameOverObj.GetComponent<Text>().text = "GameClear!!";
@@ -188,8 +188,8 @@ public class PuzzleMain : MonoBehaviour
         if (btnFlg == ButtonFlg.PRESSED)
         {
             var colors = button.colors;
-            colors.normalColor = new Color(204f / 255f, 0f / 255f, 0f / 255f, 255f / 255f);
-            colors.highlightedColor = new Color(204f / 255f, 0f / 255f, 0f / 255f, 255f / 255f);
+            colors.normalColor = new Color(255f / 255f, 51f / 255f, 153f / 255f, 255f / 255f);
+            colors.highlightedColor = new Color(255f / 255f, 51f / 255f, 153f / 255f, 255f / 255f);
             colors.pressedColor = new Color(204f / 255f, 0f / 255f, 0f / 255f, 255f / 255f);
             colors.disabledColor = new Color(204f / 255f, 0f / 255f, 0f / 255f, 255f / 255f);
 
