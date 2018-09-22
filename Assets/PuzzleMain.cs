@@ -54,11 +54,15 @@ public class PuzzleMain : MonoBehaviour
 
     public StageStatus StatusData;
 
+    private GameObject GameOverObj;
     // Use this for initialization
     void Start()
     {
+        GameOverObj = GameObject.Find("GameOverText");
+        GameOverObj.GetComponent<Text>().text = "";
+        GameOverObj.SetActive(false);
 
-        StatusData = new StageStatus(3, 10);
+        StatusData = new StageStatus(3, 5);
         StatusUpdate();
 
         btnFlg = ButtonFlg.NORMAL;
@@ -73,6 +77,19 @@ public class PuzzleMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        //ゲームーバー判定
+        if (StatusData.Hand == 0)
+        {
+            GameOverObj.GetComponent<Text>().text = "GameOver!!";
+            GameOverObj.SetActive(true);
+        }
+        //ゲームーバー判定
+        else if (StatusData.Cat == 0)
+        {
+            GameOverObj.GetComponent<Text>().text = "GameClear!!";
+            GameOverObj.SetActive(true);
+        }
 
         // スマホのタッチと、PCのクリック判定
         if (Input.GetMouseButtonDown(0))
