@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: d393e0f7dc807b042acfd5ef80de4caf
-timeCreated: 1537601981
+timeCreated: 1537606382
 licenseType: Free
 PluginImporter:
   serializedVersion: 2
@@ -61,7 +61,7 @@ PluginImporter:
       second:
         enabled: 1
         settings:
-          CPU: None
+          CPU: AnyCPU
     data:
       first:
         Standalone: Linux
@@ -117,7 +117,7 @@ PluginImporter:
       second:
         enabled: 1
         settings:
-          CPU: None
+          CPU: AnyCPU
     data:
       first:
         iPhone: iOS
