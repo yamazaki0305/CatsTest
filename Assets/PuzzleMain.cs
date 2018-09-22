@@ -224,6 +224,6 @@ public class PuzzleMain : MonoBehaviour
     {
         StatusCat.GetComponent<Text>().text = "ねこ:" + StatusData.Cat+"匹";
         StatusHand.GetComponent<Text>().text = "残り:" + StatusData.Hand+"回";
-        StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
+        //StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
     }
 }
