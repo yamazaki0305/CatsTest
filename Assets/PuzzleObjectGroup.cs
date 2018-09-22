@@ -15,8 +15,9 @@ public class PuzzleObjectGroup : MonoBehaviour {
     //ステージの縦、横大きさ
     private int Hsize = 7;
     private int Wsize = 7;
+    public int test = 1;
+    public Transform puzzleTransform;
 
-    public Transform puzzleGroup;
     //public Sprite[] puzzleSprites;
 
     public GameObject puzzlePrefab;
@@ -57,7 +58,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     }
 
                     // 生成した玉をグループ化
-                    blockData[i, j].transform.SetParent(puzzleGroup);
+                    blockData[i, j].transform.SetParent(puzzleTransform);
                     blockData[i, j].transform.position = pos;
                     blockData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
 
@@ -70,27 +71,34 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
 
     // Update is called once per frame
-    void Update () {
-
-        // スマホのタッチと、PCのクリック判定
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Collider2D collition2d = Physics2D.OverlapPoint(point);
-
-            if (collition2d)
-            {
-                if (collition2d.tag == "Block")
-                {
-                    // ここでRayが当たったGameObjectを取得できる
-                    Debug.Log(collition2d.gameObject.name);
-                    Debug.Log(collition2d.gameObject.GetComponent<BlockData>().GetType());
-                }
-            }
-        }
+    void Update() {
 
     }
 
+    //現在選択中のブロックを全てキャンセル
+    public void SelectAllCanceled()
+    {
+        for (int i = 0; i < Wsize; i++)
+        {
+            for (int j = 0; j < Hsize; j++)
+            {
+                if (blockData[i, j] != null)
+                {
+                    if( blockData[i, j].GetComponent<BlockData>().Selected )
+                    {
+                        blockData[i, j].GetComponent<BlockData>().CancelBlock();
+                        Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+                        blockData[i, j].transform.SetParent(puzzleTransform);
+                        blockData[i, j].transform.position = pos;
+                    }
+
+                }
+
+            }
+        }
+        
+    }
+    // ステージのブロックを作成
     public void stageMaker()
     {
         string[] array;

@@ -15,6 +15,7 @@ public enum BlockType
 {
     INVALID = -1,
     ALPHABET = 0,
+    SELECTED = 1,
     CRIMP,
     CAT = 4,
     SPACE
@@ -41,9 +42,25 @@ public class BlockData : MonoBehaviour
     // 7かける7のY座標
     public int Y;
 
-    public BlockType GetType()
+
+    public void TapBlock()
     {
-        return this.blockType;
+        if (this.Selected == false)
+        {
+            this.Selected = true;
+            if (this.blockType == BlockType.ALPHABET)
+                this.GetComponent<SpriteRenderer>().sprite = Sprites[(int)BlockType.SELECTED];
+        }
+        //this.GetComponentInChildren<TextMesh>().text = this.Alphabet;
+
+    }
+    public void CancelBlock()
+    {
+        this.Selected = false;
+        if (this.blockType == BlockType.ALPHABET)
+            this.GetComponent<SpriteRenderer>().sprite = Sprites[(int)BlockType.ALPHABET];
+        //this.GetComponentInChildren<TextMesh>().text = this.Alphabet;
+
     }
 
     public void setup(BlockType type, string alphabet, bool selected, int x, int y)
