@@ -15,7 +15,6 @@ public enum BlockType
 {
     INVALID = -1,
     ALPHABET = 0,
-    SELECTED = 1,
     CRIMP,
     CAT = 4,
     SPACE
@@ -36,6 +35,9 @@ public class BlockData : MonoBehaviour
     // 選択されているか？
     public bool Selected;
 
+    //英単語か？
+    public bool EigoFlg;
+
     // 7かける7のX座標
     public int X;
 
@@ -49,17 +51,24 @@ public class BlockData : MonoBehaviour
         {
             this.Selected = true;
             if (this.blockType == BlockType.ALPHABET)
-                this.GetComponent<SpriteRenderer>().sprite = Sprites[(int)BlockType.SELECTED];
+                this.GetComponent<SpriteRenderer>().sprite = Sprites[1];
         }
         //this.GetComponentInChildren<TextMesh>().text = this.Alphabet;
 
     }
-    public void CancelBlock()
+    public void ChangeBlock(bool eigoflg)
     {
-        this.Selected = false;
-        if (this.blockType == BlockType.ALPHABET)
-            this.GetComponent<SpriteRenderer>().sprite = Sprites[(int)BlockType.ALPHABET];
-        //this.GetComponentInChildren<TextMesh>().text = this.Alphabet;
+
+        if (Selected == true && eigoflg == true)
+        {
+            this.EigoFlg = eigoflg;
+            this.GetComponent<SpriteRenderer>().sprite = Sprites[2];
+        }
+        else if (Selected == true && eigoflg == false)
+        {
+            Selected = false;
+            this.GetComponent<SpriteRenderer>().sprite = Sprites[0];
+        }
 
     }
 
@@ -68,6 +77,7 @@ public class BlockData : MonoBehaviour
         this.blockType = type;
         this.Alphabet = alphabet;
         this.Selected = selected;
+        this.EigoFlg = false;
         this.X = x;
         this.Y = y;
 
@@ -106,6 +116,7 @@ public class BlockData : MonoBehaviour
         //this.transform.position = new Vector3(0, 0,0);
 
     }
+
 
     /*
     public PuzzleBlock Generate()

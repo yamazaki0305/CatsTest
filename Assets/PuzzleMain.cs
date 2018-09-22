@@ -10,7 +10,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-// ブロックのタイプを定義
+// ボタンのタイプを定義
 public enum ButtonFlg
 {
     NORMAL = 1,
@@ -18,26 +18,55 @@ public enum ButtonFlg
     EIGO = 3,
 }
 
-public class PuzzleMain : MonoBehaviour {
+public class StageStatus
+{
+    public int Cat;
+    public int Hand;
+    public int Score;
+
+    //ヘッダーに表示するステータスのclass
+    // コンストラクタでインスタンスを生成した時に情報を渡す
+    public StageStatus(int cat, int hand)
+    {
+        this.Cat = cat;
+        this.Hand = hand;
+        this.Score = 0;
+    }
+}
+
+public class PuzzleMain : MonoBehaviour
+{
 
     public GameObject EigoButton;
+
+    //ヘッダーStatusのアタッチ
+    public GameObject StatusCat;
+    public GameObject StatusHand;
+    public GameObject StatusScore;
 
     // パズルオブジェクトグループコンポーネント
     [SerializeField]
     PuzzleObjectGroup puzzleObjectGroup = null;
 
     private string EigoText;
-    ButtonFlg btnFlg;
+    // EigoTextの状態を保持(NORMAL/PRESSED/EIGO)
+    public ButtonFlg btnFlg;
+
+    public StageStatus StatusData;
 
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
+
+        StatusData = new StageStatus(3, 10);
+        StatusUpdate();
 
         btnFlg = ButtonFlg.NORMAL;
 
         EigoText = "";
         //EigoText.GetComponent<Text>().text = "";
 
-        
+
 
     }
 
@@ -56,8 +85,8 @@ public class PuzzleMain : MonoBehaviour {
             {
                 if (collition2d.tag == "Block")
                 {
-                
-                    if(collition2d.GetComponent<BlockData>().blockType == BlockType.ALPHABET)
+
+                    if (collition2d.GetComponent<BlockData>().blockType == BlockType.ALPHABET)
                     {
                         if (!collition2d.GetComponent<BlockData>().Selected)
                         {
@@ -68,10 +97,25 @@ public class PuzzleMain : MonoBehaviour {
                             EigoButton.GetComponentInChildren<Text>().text = EigoText;
                             Debug.Log(EigoText);
 
+                            //英単語になったかの判定分岐
+                            //英単語になった時=現在は４文字以上で英単語と判定する
+                            if(EigoText.Length >= 4)
+                            {
+                                btnFlg = ButtonFlg.EIGO;
+                                puzzleObjectGroup.SelectEigoChange();
+                                
+
+                            }
+                            //英単語ではない
+                            else
+                            {
+                                btnFlg = ButtonFlg.PRESSED;
+                            }
                             var button = EigoButton.GetComponent<Button>();
-                            ButtonColorChange(button, ButtonFlg.PRESSED);
+                            ButtonColorChange(button);
+
                         }
-           
+
                     }
                 }
             }
@@ -84,13 +128,30 @@ public class PuzzleMain : MonoBehaviour {
         SceneManager.LoadScene("PuzzleGame");
     }
     public void PressEigoButton()
-    { 
+    {
         var button = EigoButton.GetComponent<Button>();
-        ButtonColorChange(button, ButtonFlg.NORMAL);
-        EigoText = "";
-        EigoButton.GetComponentInChildren<Text>().text = EigoText;
 
-        puzzleObjectGroup.SelectAllCanceled();
+        if (btnFlg == ButtonFlg.PRESSED)
+        {
+            EigoText = "";
+            EigoButton.GetComponentInChildren<Text>().text = EigoText;
+            puzzleObjectGroup.SelectAllCanceled();
+            btnFlg = ButtonFlg.NORMAL;
+
+            ButtonColorChange(button);
+        }
+        else if (btnFlg == ButtonFlg.EIGO)
+        {
+            StatusData.Score += EigoText.Length * 10;
+            StatusData.Hand--;
+            StatusUpdate();
+            EigoText = "";
+            EigoButton.GetComponentInChildren<Text>().text = EigoText;
+            puzzleObjectGroup.SelectEigoDestroy();
+            btnFlg = ButtonFlg.NORMAL;
+
+            ButtonColorChange(button);
+        }
         /*
         Debug.Log("ログ"+ puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0,0].GetComponent<BlockData>().Alphabet);
         puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0, 0].GetComponent<BlockData>().Alphabet = "B";
@@ -105,7 +166,7 @@ public class PuzzleMain : MonoBehaviour {
 
     }
 
-    void ButtonColorChange(Button button, ButtonFlg btnFlg)
+    void ButtonColorChange(Button button)
     {
         if (btnFlg == ButtonFlg.PRESSED)
         {
@@ -127,6 +188,25 @@ public class PuzzleMain : MonoBehaviour {
 
             EigoButton.GetComponent<Button>().colors = colors;
         }
+        else if (btnFlg == ButtonFlg.EIGO)
+        {
+            var colors = button.colors;
+            colors.normalColor = new Color(255f / 255f, 255f / 255f, 153f / 255f, 255f / 255f);
+            colors.highlightedColor = new Color(255f / 255f, 255f / 255f, 153f / 255f, 255f / 255f);
+            colors.pressedColor = new Color(255f / 255f, 255f / 255f, 153f / 255f, 255f / 255f);
+            colors.disabledColor = new Color(255f / 255f, 255f / 255f, 153f / 255f, 255f / 255f);
+
+            EigoButton.GetComponent<Button>().colors = colors;
+
+
+
+        }
     }
 
+    public void StatusUpdate()
+    {
+        StatusCat.GetComponent<Text>().text = "ねこ:" + StatusData.Cat+"匹";
+        StatusHand.GetComponent<Text>().text = "残り:" + StatusData.Hand+"回";
+        StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
+    }
 }

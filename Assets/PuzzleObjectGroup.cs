@@ -86,17 +86,60 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 {
                     if( blockData[i, j].GetComponent<BlockData>().Selected )
                     {
-                        blockData[i, j].GetComponent<BlockData>().CancelBlock();
+                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(false);
                         Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
                         blockData[i, j].transform.SetParent(puzzleTransform);
-                        blockData[i, j].transform.position = pos;
+                        //blockData[i, j].transform.position = pos;
                     }
 
                 }
 
             }
         }
-        
+    }
+
+    //現在選択中のブロックを英単語にする
+    public void SelectEigoChange()
+    {
+        for (int i = 0; i < Wsize; i++)
+        {
+            for (int j = 0; j < Hsize; j++)
+            {
+                if (blockData[i, j] != null)
+                {
+                    if (blockData[i, j].GetComponent<BlockData>().Selected)
+                    {
+                        
+                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(true);
+                        Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+                        blockData[i, j].transform.SetParent(puzzleTransform);
+                        //blockData[i, j].transform.position = pos;
+                    }
+
+                }
+
+            }
+        }
+    }
+    //現在選択中の英語ブロックを消す
+    public void SelectEigoDestroy()
+    {
+        for (int i = 0; i < Wsize; i++)
+        {
+            for (int j = 0; j < Hsize; j++)
+            {
+                if (blockData[i, j] != null)
+                {
+                    if (blockData[i, j].GetComponent<BlockData>().EigoFlg)
+                    {
+                        Destroy(blockData[i, j]);
+                        
+                    }
+
+                }
+
+            }
+        }
     }
     // ステージのブロックを作成
     public void stageMaker()

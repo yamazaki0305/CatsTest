@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 222058783928860212}
   - component: {fileID: 61843030325174990}
   - component: {fileID: 114897769708576626}
+  - component: {fileID: 50166741910045752}
   m_Layer: 0
   m_Name: BlockPrefab
   m_TagString: Block
@@ -79,6 +80,26 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!50 &50166741910045752
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1469833672120550}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 5
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 5
 --- !u!61 &61843030325174990
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -146,6 +167,7 @@ MonoBehaviour:
   blockType: 0
   Alphabet: 
   Selected: 0
+  EigoFlg: 0
   X: 0
   Y: 0
 --- !u!212 &212069661503923890
@@ -204,7 +226,7 @@ RectTransform:
   m_GameObject: {fileID: 1469833672120550}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 90, y: 90, z: 1}
+  m_LocalScale: {x: 85, y: 85, z: 1}
   m_Children:
   - {fileID: 224921009655630148}
   m_Father: {fileID: 0}
