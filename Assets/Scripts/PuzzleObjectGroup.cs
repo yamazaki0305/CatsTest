@@ -202,12 +202,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
             }
         }
 
-        Debug.Log("rowLength:"+ rowLength);
-        Debug.Log("columnLength:" + columnLength);
-
-        
-        string[] array;
-        array = new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+        char[]eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray(); ;
 
         int k = rowLength-1;
         for (int i = 0; i < rowLength; i++)
@@ -229,8 +224,8 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 //アルファベットランダム
                 else if(str =="#")
                 {
-                    int rand = UnityEngine.Random.Range(0, 26);
-                    stageData[n, k] = array[rand];
+                    int rand = UnityEngine.Random.Range(0, eigochar.Length);
+                    stageData[n, k] = eigochar[rand].ToString();
                 }
                 //アルファベット
                 else
@@ -241,31 +236,6 @@ public class PuzzleObjectGroup : MonoBehaviour {
             }
             k--;
         }
-
-        /*
-        string[] array;
-        array = new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
-
-        for (int i = 0; i < Wsize; i++)
-        {
-            for (int j = 0; j < Hsize; j++)
-            {
-                int rand = UnityEngine.Random.Range(0, 26);
-                stageData[i, j] = array[rand];
-            }
-        }
-
-        //7列目を空白にする
-        for (int i = 0; i < Wsize; i++)
-        {
-            stageData[i, Hsize - 1] = "";
-        }
-        //7列目に猫を配置
-        stageData[1, Hsize - 1] = "cat";
-        stageData[3, Hsize - 1] = "cat";
-        stageData[5, Hsize - 1] = "cat";
-        */
-
 
     }
 

@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
+using System.Globalization;
 
 // ボタンのタイプを定義
 public enum ButtonFlg
@@ -23,6 +24,7 @@ public class StageStatus
     public int Cat;
     public int Hand;
     public int Score;
+    public int star;
 
     //ヘッダーに表示するステータスのclass
     // コンストラクタでインスタンスを生成した時に情報を渡す
@@ -31,6 +33,7 @@ public class StageStatus
         this.Cat = cat;
         this.Hand = hand;
         this.Score = 0;
+        this.star = 0;
     }
 }
 
@@ -136,17 +139,16 @@ public class PuzzleMain : MonoBehaviour
             return;
         }
 
-
-        //ゲームーバー判定
-        if (StatusData.Hand == 0)
-        {
-            GameOverObj.GetComponent<Text>().text = "GameOver!!";
-            GameOverObj.SetActive(true);
-        }
         //ゲームクリア判定
-        else if (StatusData.Cat == 0)
+        if (StatusData.Cat == 0)
         {
             GameOverObj.GetComponent<Text>().text = "GameClear!!";
+            GameOverObj.SetActive(true);
+        }
+        //ゲームーバー判定
+        else if (StatusData.Hand == 0)
+        {
+            GameOverObj.GetComponent<Text>().text = "GameOver!!";
             GameOverObj.SetActive(true);
         }
 
@@ -247,6 +249,31 @@ public class PuzzleMain : MonoBehaviour
 
                 TransText += str;
 
+            }
+            if( judge == false)
+            {
+                //全て小文字にする
+                string inStr = EigoText.ToLowerInvariant();
+
+                //1文字目を大文字で検索
+                TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+                string outStr = ti.ToTitleCase(inStr);
+
+                query = "select word,mean from items where word ='" + outStr + "'";
+                dataTable = sqlDB.ExecuteQuery(query);
+                TransText = "";
+                foreach (DataRow dr in dataTable.Rows)
+                {
+                    judge = true;
+                    string word = (string)dr["word"];
+                    string str = (string)dr["mean"];
+                    // attack = (int)dr["attack"];
+                    Debug.Log("word:" + word);
+                    Debug.Log("mean:" + str);
+
+                    TransText += str;
+
+                }
             }
         }
 
