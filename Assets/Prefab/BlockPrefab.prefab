@@ -94,7 +94,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 5
+  m_GravityScale: 10
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -163,7 +163,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: c741d4c011c75ee4781534f905667b17, type: 3}
   - {fileID: 21300000, guid: 25173d3475352364e8b25f0d8fe58c03, type: 3}
   - {fileID: 21300000, guid: 0c0f7090420dbc04b965ff2b2a99ceaf, type: 3}
-  - {fileID: 0}
+  - {fileID: 21300000, guid: 0c0f7090420dbc04b965ff2b2a99ceaf, type: 3}
   blockType: 0
   Alphabet: 
   Selected: 0
@@ -224,9 +224,9 @@ RectTransform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1469833672120550}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 85, y: 85, z: 1}
+  m_LocalScale: {x: 88, y: 88, z: 1}
   m_Children:
   - {fileID: 224921009655630148}
   m_Father: {fileID: 0}

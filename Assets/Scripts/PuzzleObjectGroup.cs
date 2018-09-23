@@ -21,9 +21,13 @@ public class PuzzleObjectGroup : MonoBehaviour {
     //public Sprite[] puzzleSprites;
 
     public GameObject puzzlePrefab;
+    public GameObject MaskPrefab;
 
     // 7列のデータを作成している。このブロックのデータでゲームを制御
     public GameObject[,] blockData = new GameObject[7, 7];
+
+    // 7列のデータを作成している。このブロックのデータでゲームを制御
+    public GameObject[,] MaskData = new GameObject[7, 7];
 
     public string[,] stageData = new string[7, 7];
 
@@ -44,6 +48,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
 
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
                     blockData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
                     if (stageData[i, j] == "cat")
                     {
@@ -53,9 +58,16 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     }
                     else
                     {
+                        MaskData[i, j] = MaskPrefab;
+                        MaskData[i, j].name = "Mask";
                         blockData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
                         blockData[i, j].name = "Block"; // GameObjectの名前を決めている
                     }
+
+
+                    //MaskData[i, j].transform.SetParent(puzzleTransform);
+                    //MaskData[i, j].transform.position = pos;
+                    //MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
 
                     // 生成した玉をグループ化
                     blockData[i, j].transform.SetParent(puzzleTransform);
