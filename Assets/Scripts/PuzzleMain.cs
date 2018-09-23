@@ -56,6 +56,10 @@ public class PuzzleMain : MonoBehaviour
 
     private GameObject GameOverObj;
     // Use this for initialization
+
+    // リストを作っている
+    private List<BlockData> blockDataList = new List<BlockData>();
+
     void Start()
     {
         GameOverObj = GameObject.Find("GameOverText");
@@ -97,30 +101,34 @@ public class PuzzleMain : MonoBehaviour
             Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Collider2D collition2d = Physics2D.OverlapPoint(point);
 
+            BlockData blockData = collition2d.GetComponent<BlockData>();
+
             // ここでRayが当たったGameObjectを取得できる
             if (collition2d)
             {
                 if (collition2d.tag == "Block")
                 {
 
-                    if (collition2d.GetComponent<BlockData>().blockType == BlockType.ALPHABET)
+                    if (blockData.blockType == BlockType.ALPHABET)
                     {
-                        if (!collition2d.GetComponent<BlockData>().Selected)
+                        if (!blockData.Selected)
                         {
-                            collition2d.GetComponent<BlockData>().TapBlock();
+                            blockDataList.Add(blockData);
+
+                            blockData.TapBlock();
 
                             // ここでRayが当たったGameObjectを取得できる
-                            EigoText += collition2d.gameObject.GetComponent<BlockData>().Alphabet;
+                            EigoText += blockData.Alphabet;
                             EigoButton.GetComponentInChildren<Text>().text = EigoText;
-                            Debug.Log(EigoText);
+                            //                            Debug.Log(EigoText);
 
                             //英単語になったかの判定分岐
                             //英単語になった時=現在は４文字以上で英単語と判定する
-                            if(EigoText.Length >= 4)
+                            if (EigoText.Length >= 4)
                             {
                                 btnFlg = ButtonFlg.EIGO;
                                 puzzleObjectGroup.SelectEigoChange();
-                                
+
 
                             }
                             //英単語ではない
@@ -132,7 +140,17 @@ public class PuzzleMain : MonoBehaviour
                             ButtonColorChange(button);
 
                         }
+                        else
+                        {
+                            int x = blockDataList[blockDataList.Count - 1].X;
+                            int y = blockDataList[blockDataList.Count - 1].Y;
 
+                            if (blockData.X == x && blockData.Y == y)
+                            {
+                                blockDataList[blockDataList.Count - 1].ChangeBlock(false);
+                                blockDataList.Clear();
+                            }
+                        }
                     }
                 }
             }
@@ -222,8 +240,8 @@ public class PuzzleMain : MonoBehaviour
 
     public void StatusUpdate()
     {
-        StatusCat.GetComponent<Text>().text = "ねこ:" + StatusData.Cat+"匹";
-        StatusHand.GetComponent<Text>().text = "残り:" + StatusData.Hand+"回";
+        StatusCat.GetComponent<Text>().text = "ねこ:" + StatusData.Cat + "匹";
+        StatusHand.GetComponent<Text>().text = "残り:" + StatusData.Hand + "回";
         //StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
     }
 }
