@@ -82,7 +82,7 @@ public class PuzzleMain : MonoBehaviour
         GameOverObj.GetComponent<Text>().text = "";
         GameOverObj.SetActive(false);
 
-        StatusData = new StageStatus(3, 5);
+        StatusData = new StageStatus(3, 10);
         StatusUpdate();
 
         btnFlg = ButtonFlg.NORMAL;
@@ -101,6 +101,12 @@ public class PuzzleMain : MonoBehaviour
         if (TransWindowflg)
         {
             TransWindow.SetActive(true);
+            Vector2 pos = new Vector2(0, -170);
+            TransWindow.transform.position = pos;
+            //Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
+            //TransWindow.transform.SetParent(trans);
+
+            Debug.Log("z:" + TransWindow.transform.position.z);
 
             Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
             EngText.GetComponent<Text>().text = EigoText;

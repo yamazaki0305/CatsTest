@@ -228,10 +228,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   test: 1
-  puzzleTransform: {fileID: 0}
+  puzzleTransform: {fileID: 154382838}
   puzzlePrefab: {fileID: 1469833672120550, guid: 3199e127a9ea29e41943dfb8b3ab4fd0,
     type: 2}
   MaskPrefab: {fileID: 1240882874607732, guid: 3152ea46ee4d5c247b84ff9251c7ffa9, type: 2}
+  textMessage: []
 --- !u!1 &253775241
 GameObject:
   m_ObjectHideFlags: 0
@@ -649,7 +650,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -50}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 400, y: 50}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &725863789
@@ -1010,11 +1011,11 @@ RectTransform:
   m_Father: {fileID: 1837421662}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 50, y: -120}
-  m_SizeDelta: {x: 520, y: 700}
-  m_Pivot: {x: 0, y: 1}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
+  m_AnchoredPosition: {x: -10, y: -70}
+  m_SizeDelta: {x: 520, y: 650}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1231619872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1267,7 +1268,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u52D5\u7269\n\u5C0A\u656C\u3059\u308B\r\n\u4F59\u88D5\u304C\u3042\u308B"
+  m_Text: "[\u540D]\u52D5\u7269\r\n[\u540D]\u4EBA\u3005\r\n[\u52D5]\u78BA\u8A8D\u3059\u308B"
 --- !u!222 &1671448873
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1560,7 +1561,7 @@ RectTransform:
   m_GameObject: {fileID: 1784424808}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6.5, y: 9, z: 1}
+  m_LocalScale: {x: 6.5, y: 8, z: 1}
   m_Children: []
   m_Father: {fileID: 1837421662}
   m_RootOrder: 0
@@ -1639,8 +1640,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -68}
-  m_SizeDelta: {x: 640, y: 800}
+  m_AnchoredPosition: {x: 1000, y: -170}
+  m_SizeDelta: {x: 640, y: 640}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1837421663
 MonoBehaviour:
