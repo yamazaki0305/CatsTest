@@ -49,13 +49,19 @@ public class PuzzleMain : MonoBehaviour
     PuzzleObjectGroup puzzleObjectGroup = null;
 
     private string EigoText;
+    private string TransText;
     // EigoTextの状態を保持(NORMAL/PRESSED/EIGO)
     public ButtonFlg btnFlg;
 
     public StageStatus StatusData;
 
+    //ゲームオーバークリアの表示
     private GameObject GameOverObj;
     // Use this for initialization
+
+    //英訳のWindow
+    private GameObject TransWindow;
+    bool TransWindowflg = false;
 
     //DBの定義
     SqliteDatabase sqlDB;
@@ -65,7 +71,12 @@ public class PuzzleMain : MonoBehaviour
 
     void Start()
     {
+        //DBの設定
         sqlDB = new SqliteDatabase("ejdict.sqlite3");
+
+        //GameObjectを探して格納
+        TransWindow = GameObject.Find("TransWindow");
+        TransWindow.SetActive(false);
 
         GameOverObj = GameObject.Find("GameOverText");
         GameOverObj.GetComponent<Text>().text = "";
@@ -77,6 +88,7 @@ public class PuzzleMain : MonoBehaviour
         btnFlg = ButtonFlg.NORMAL;
 
         EigoText = "";
+        TransText = "";
         //EigoText.GetComponent<Text>().text = "";
 
 
@@ -86,6 +98,38 @@ public class PuzzleMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (TransWindowflg)
+        {
+            TransWindow.SetActive(true);
+
+            Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
+            EngText.GetComponent<Text>().text = EigoText;
+            Text JapText = GameObject.Find("JapWord").GetComponent<Text>();
+            JapText.GetComponent<Text>().text = TransText;
+
+            // スマホのタッチと、PCのクリック判定
+            if (Input.GetMouseButtonDown(0))
+            {
+                TransWindowflg = false;
+                TransWindow.SetActive(false);
+
+
+                var button = EigoButton.GetComponent<Button>();
+
+                StatusData.Score += EigoText.Length * 10;
+                StatusData.Hand--;
+                StatusUpdate();
+                EigoText = "";
+                EigoButton.GetComponentInChildren<Text>().text = EigoText;
+                puzzleObjectGroup.SelectEigoDestroy();
+                btnFlg = ButtonFlg.NORMAL;
+
+                ButtonColorChange(button);
+            }
+
+            return;
+        }
+
 
         //ゲームーバー判定
         if (StatusData.Hand == 0)
@@ -184,6 +228,8 @@ public class PuzzleMain : MonoBehaviour
             string eigo = EigoText.ToLowerInvariant();
             string query = "select word,mean from items where word ='" + eigo + "'";
             DataTable dataTable = sqlDB.ExecuteQuery(query);
+
+            TransText = "";
             foreach (DataRow dr in dataTable.Rows)
             {
                 judge = true;
@@ -192,6 +238,8 @@ public class PuzzleMain : MonoBehaviour
                 // attack = (int)dr["attack"];
                 Debug.Log("word:" + word);
                 Debug.Log("mean:" + str);
+
+                TransText += str;
 
             }
         }
@@ -218,6 +266,7 @@ public class PuzzleMain : MonoBehaviour
         //英単語ではない
         else
         {
+            TransText = "";
             btnFlg = ButtonFlg.PRESSED;
             for (int i = 0; i < blockDataList.Count; i++)
             {
@@ -251,6 +300,8 @@ public class PuzzleMain : MonoBehaviour
         }
         else if (btnFlg == ButtonFlg.EIGO)
         {
+            TransWindowflg = true;
+            /*
             StatusData.Score += EigoText.Length * 10;
             StatusData.Hand--;
             StatusUpdate();
@@ -260,6 +311,7 @@ public class PuzzleMain : MonoBehaviour
             btnFlg = ButtonFlg.NORMAL;
 
             ButtonColorChange(button);
+            */
         }
 
         //ブロックデータリストをクリア
