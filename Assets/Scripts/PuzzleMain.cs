@@ -195,6 +195,8 @@ public class PuzzleMain : MonoBehaviour
 
             }
         }
+
+
         //英単語になった時=現在は４文字以上で英単語と判定する
         if (judge)
         {
@@ -205,6 +207,12 @@ public class PuzzleMain : MonoBehaviour
             }
             puzzleObjectGroup.SelectEigoChange();
 
+
+        }
+        else if (EigoText.Length == 0)
+        {
+
+            btnFlg = ButtonFlg.NORMAL;
 
         }
         //英単語ではない
