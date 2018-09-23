@@ -15,16 +15,17 @@ public class testDB : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-        SqliteDatabase sqlDB = new SqliteDatabase("default.db");
+        SqliteDatabase sqlDB = new SqliteDatabase("ejdict.sqlite3");
 
-        string query = "select name from example where dummy=1";
+        string test = "apple";
+        string query = "select mean from items where word ='"+test+"'";
         DataTable dataTable = sqlDB.ExecuteQuery(query);
 
         foreach (DataRow dr in dataTable.Rows)
         {
-            name = (string)dr["name"];
+            string str = (string)dr["mean"];
            // attack = (int)dr["attack"];
-            Debug.Log("name:" + name );
+            Debug.Log("name:" + str );
         }
 
         /*

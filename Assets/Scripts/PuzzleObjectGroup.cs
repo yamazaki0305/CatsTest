@@ -98,7 +98,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 {
                     if( blockData[i, j].GetComponent<BlockData>().Selected )
                     {
-                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(false);
+                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(false,false);
                         Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
                         blockData[i, j].transform.SetParent(puzzleTransform);
                         //blockData[i, j].transform.position = pos;
@@ -122,7 +122,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     if (blockData[i, j].GetComponent<BlockData>().Selected)
                     {
                         
-                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(true);
+                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(true,true);
                         Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
                         blockData[i, j].transform.SetParent(puzzleTransform);
                         //blockData[i, j].transform.position = pos;

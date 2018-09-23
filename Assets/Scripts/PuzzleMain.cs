@@ -57,11 +57,16 @@ public class PuzzleMain : MonoBehaviour
     private GameObject GameOverObj;
     // Use this for initialization
 
+    //DBの定義
+    SqliteDatabase sqlDB;
+
     // リストを作っている
     private List<BlockData> blockDataList = new List<BlockData>();
 
     void Start()
     {
+        sqlDB = new SqliteDatabase("ejdict.sqlite3");
+
         GameOverObj = GameObject.Find("GameOverText");
         GameOverObj.GetComponent<Text>().text = "";
         GameOverObj.SetActive(false);
@@ -101,13 +106,14 @@ public class PuzzleMain : MonoBehaviour
             Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Collider2D collition2d = Physics2D.OverlapPoint(point);
 
-            BlockData blockData = collition2d.GetComponent<BlockData>();
+            BlockData blockData;
 
             // ここでRayが当たったGameObjectを取得できる
             if (collition2d)
             {
                 if (collition2d.tag == "Block")
                 {
+                    blockData = collition2d.GetComponent<BlockData>();
 
                     if (blockData.blockType == BlockType.ALPHABET)
                     {
@@ -122,9 +128,11 @@ public class PuzzleMain : MonoBehaviour
                             EigoButton.GetComponentInChildren<Text>().text = EigoText;
                             //                            Debug.Log(EigoText);
 
-                            //英単語になったかの判定分岐
-                            //英単語になった時=現在は４文字以上で英単語と判定する
-                            if (EigoText.Length >= 4)
+                            //英単語になったかの判定
+                            bool judge = EigoJudgement();
+
+                            //英単語になった時
+                            if (judge)
                             {
                                 btnFlg = ButtonFlg.EIGO;
                                 puzzleObjectGroup.SelectEigoChange();
@@ -145,10 +153,19 @@ public class PuzzleMain : MonoBehaviour
                             int x = blockDataList[blockDataList.Count - 1].X;
                             int y = blockDataList[blockDataList.Count - 1].Y;
 
+                            // 最後にタップしたブロックの選択を解除
                             if (blockData.X == x && blockData.Y == y)
                             {
-                                blockDataList[blockDataList.Count - 1].ChangeBlock(false);
-                                blockDataList.Clear();
+                                blockDataList[blockDataList.Count - 1].ChangeBlock(false,false);
+                                blockDataList.RemoveRange(blockDataList.Count-1, 1);
+
+                                //末尾から1文字削除する
+                                EigoText = EigoText.Remove(EigoText.Length - 1, 1);
+                                EigoButton.GetComponentInChildren<Text>().text = EigoText;
+                                EigoJudgement();
+
+
+
                             }
                         }
                     }
@@ -157,6 +174,55 @@ public class PuzzleMain : MonoBehaviour
         }
 
     }
+
+    bool EigoJudgement()
+    {
+        //英単語になったかの判定は2文字以上から
+        bool judge = false;
+        if (EigoText.Length >= 2)
+        {
+            string eigo = EigoText.ToLowerInvariant();
+            string query = "select word,mean from items where word ='" + eigo + "'";
+            DataTable dataTable = sqlDB.ExecuteQuery(query);
+            foreach (DataRow dr in dataTable.Rows)
+            {
+                judge = true;
+                string word = (string)dr["word"];
+                string str = (string)dr["mean"];
+                // attack = (int)dr["attack"];
+                Debug.Log("word:" + word);
+                Debug.Log("mean:" + str);
+
+            }
+        }
+        //英単語になった時=現在は４文字以上で英単語と判定する
+        if (judge)
+        {
+            btnFlg = ButtonFlg.EIGO;
+            for (int i = 0; i < blockDataList.Count; i++)
+            {
+                blockDataList[i].ChangeBlock(true, true);
+            }
+            puzzleObjectGroup.SelectEigoChange();
+
+
+        }
+        //英単語ではない
+        else
+        {
+            btnFlg = ButtonFlg.PRESSED;
+            for (int i = 0; i < blockDataList.Count; i++)
+            {
+                blockDataList[i].ChangeBlock(true, false);
+            }
+        }
+        var button = EigoButton.GetComponent<Button>();
+        ButtonColorChange(button);
+
+        return judge;
+    }
+
+ 
 
     public void ReloadButton()
     {
@@ -187,17 +253,9 @@ public class PuzzleMain : MonoBehaviour
 
             ButtonColorChange(button);
         }
-        /*
-        Debug.Log("ログ"+ puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0,0].GetComponent<BlockData>().Alphabet);
-        puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0, 0].GetComponent<BlockData>().Alphabet = "B";
-        puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0, 0].GetComponentInChildren<TextMesh>().text = puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0, 0].GetComponent<BlockData>().Alphabet;
-        //Debug.Log("aaa" + obj.blockData[0][0].GetComponent<BlockData>.X);
 
-        Vector2 pos = new Vector2(0 * 90 - 320 + 45, 0 * 90 - 270);
-        puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0,0].transform.SetParent(puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().puzzleTransform);
-        puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0,0].transform.position = pos;
-        puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().blockData[0,0].transform.localScale = puzzleObjectGroup.GetComponent<PuzzleObjectGroup>().puzzlePrefab.transform.localScale;
-        */
+        //ブロックデータリストをクリア
+        blockDataList.Clear();
 
     }
 

@@ -56,17 +56,25 @@ public class BlockData : MonoBehaviour
         //this.GetComponentInChildren<TextMesh>().text = this.Alphabet;
 
     }
-    public void ChangeBlock(bool eigoflg)
+    public void ChangeBlock(bool selected,bool eigoflg )
     {
-
-        if (Selected == true && eigoflg == true)
+        
+        if (selected == true && eigoflg == true)
         {
+            this.Selected = selected;
             this.EigoFlg = eigoflg;
             this.GetComponent<SpriteRenderer>().sprite = Sprites[2];
         }
-        else if (Selected == true && eigoflg == false)
+        else if (selected == true && eigoflg == false)
         {
-            Selected = false;
+            this.Selected = selected;
+            this.EigoFlg = eigoflg;
+            this.GetComponent<SpriteRenderer>().sprite = Sprites[1];
+        }
+        else if (selected == false && eigoflg == false)
+        {
+            this.Selected = selected;
+            this.EigoFlg = eigoflg;
             this.GetComponent<SpriteRenderer>().sprite = Sprites[0];
         }
 
