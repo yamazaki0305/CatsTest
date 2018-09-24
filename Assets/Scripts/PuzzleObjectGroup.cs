@@ -48,12 +48,35 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                 //空白の時
                 if (stageData[i, j] != "")
-                { 
+                {
 
                     Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
 
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
                     MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
+
+
+                    MaskData[i, j].name = "Mask";
+                    MaskData[i, j].transform.SetParent(puzzleTransform);
+                    MaskData[i, j].transform.position = pos;
+                    MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
+
+                }
+            }
+        }
+
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+
+                //空白の時
+                if (stageData[i, j] != "")
+                { 
+
+                    Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
                     blockData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
                     if (stageData[i, j] == "cat")
                     {
@@ -66,11 +89,6 @@ public class PuzzleObjectGroup : MonoBehaviour {
                         blockData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
                         blockData[i, j].name = "Block"; // GameObjectの名前を決めている
                     }
-
-                    MaskData[i, j].name = "Mask";
-                    MaskData[i, j].transform.SetParent(puzzleTransform);
-                    MaskData[i, j].transform.position = pos;
-                    MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
 
                     // 生成したGameObjectをヒエラルキーに表示
                     blockData[i, j].transform.SetParent(puzzleTransform);

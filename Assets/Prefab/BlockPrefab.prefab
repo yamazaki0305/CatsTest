@@ -170,6 +170,8 @@ MonoBehaviour:
   EigoFlg: 0
   X: 0
   Y: 0
+  alpha: 1
+  death: 0
 --- !u!212 &212069661503923890
 SpriteRenderer:
   m_ObjectHideFlags: 1
