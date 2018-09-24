@@ -37,6 +37,105 @@ public class StageStatus
     }
 }
 
+public class StarReword
+{
+
+    public string[,] starWord;
+    public int star_count;
+    public bool[] bstar;
+    public string starJaptext;
+    public GameObject[] StarObjStar;
+
+    public StarReword(string estr0,string jstr0, string estr1, string jstr1, string estr2, string jstr2)
+    {
+        starWord = new string[3,2];
+        bstar = new bool[3];
+        StarObjStar = new GameObject[3];
+
+        star_count = 0;
+
+        bstar[0] = false;
+        starWord[0, 0] = estr0;
+        starWord[0, 1] = jstr0;
+        bstar[1] = false;
+        starWord[1, 0] = estr1;
+        starWord[1, 1] = jstr1;
+        bstar[2] = false;
+        starWord[2, 0] = estr2;
+        starWord[2, 1] = jstr2;
+
+        starJaptext = "";
+
+        GameObject StarText = GameObject.Find("StarText");
+
+        for(int i=0;i<3;i++)
+        {
+            if(!bstar[i])
+            {
+                starJaptext += starWord[i, 1];
+                starJaptext += "\n";
+            }
+        }
+
+        StarText.GetComponent<Text>().text = starJaptext;
+        Debug.Log(starJaptext);
+        
+        StarObjStar[0] = GameObject.Find("StarObj0/Star");
+        StarObjStar[0].SetActive(false);
+        StarObjStar[1] = GameObject.Find("StarObj1/Star");
+        StarObjStar[1].SetActive(false);
+        StarObjStar[2] = GameObject.Find("StarObj2/Star");
+        StarObjStar[2].SetActive(false);
+        //StarObj[0].Get("Star");
+
+
+    }
+    public bool StarCheck(string eigo)
+    {
+        string EigoText = eigo;
+        bool b = false;
+        bool bAdd = false;
+
+        for(int i=0;i<3; i++)
+        {
+            if( eigo == starWord[i, 0])
+            {
+                if(!bstar[i])
+                {
+                    bstar[i] = true;
+                    string str = starWord[i, 1];
+                    starWord[i, 1] = "<color='yellow'>"+str+"</color>";
+                    star_count++;
+                    bAdd = true;
+
+                }
+                b = true;
+            }
+        }
+
+        if (bAdd)
+        {
+            for (int i = 0; i < star_count; i++)
+            {
+                StarObjStar[i].SetActive(true);
+            }
+
+            starJaptext = "";
+            for (int i = 0; i < 3; i++)
+            {
+                starJaptext += starWord[i, 1];
+                starJaptext += "\n";
+            }
+            GameObject StarText = GameObject.Find("StarText");
+            StarText.GetComponent<Text>().text = starJaptext;
+        }
+
+        return b;
+
+    }
+
+}
+
 public class PuzzleMain : MonoBehaviour
 {
 
@@ -57,6 +156,7 @@ public class PuzzleMain : MonoBehaviour
     public ButtonFlg btnFlg;
 
     public StageStatus StatusData;
+    public StarReword StarData;
 
     //ゲームオーバークリアの表示
     private GameObject GameOverObj;
@@ -74,8 +174,12 @@ public class PuzzleMain : MonoBehaviour
 
     void Start()
     {
-        //DBの設定
-        sqlDB = new SqliteDatabase("ejdict.sqlite3");
+
+        //★ミッションの設定
+        StarData = new  StarReword("ANIMAL", "[名]動物", "PEOPLE", "[名]人々", "CHECK", "[動]確認する");
+
+       //DBの設定
+       sqlDB = new SqliteDatabase("ejdict.sqlite3");
 
         //GameObjectを探して格納
         TransWindow = GameObject.Find("TransWindow");
@@ -103,6 +207,7 @@ public class PuzzleMain : MonoBehaviour
     {
         if (TransWindowflg)
         {
+
             TransWindow.SetActive(true);
             Vector2 pos = new Vector2(0, -170);
             TransWindow.transform.position = pos;
@@ -115,6 +220,9 @@ public class PuzzleMain : MonoBehaviour
             EngText.GetComponent<Text>().text = EigoText;
             Text JapText = GameObject.Find("JapWord").GetComponent<Text>();
             JapText.GetComponent<Text>().text = TransText;
+
+            //スターリワードをチェック
+            StarData.StarCheck(EigoText);
 
             // スマホのタッチと、PCのクリック判定
             if (Input.GetMouseButtonDown(0))
@@ -393,6 +501,6 @@ public class PuzzleMain : MonoBehaviour
     {
         StatusCat.GetComponent<Text>().text = "ねこ:" + StatusData.Cat + "匹";
         StatusHand.GetComponent<Text>().text = "残り:" + StatusData.Hand + "回";
-        //StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
+        StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
     }
 }
