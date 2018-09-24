@@ -166,6 +166,10 @@ public class PuzzleMain : MonoBehaviour
     private GameObject TransWindow;
     bool TransWindowflg = false;
 
+    //ゲーム開始前の処理
+    private GameObject StartWindow;
+    bool bStartFlg = true;
+
     //DBの定義
     SqliteDatabase sqlDB;
 
@@ -184,6 +188,8 @@ public class PuzzleMain : MonoBehaviour
         //GameObjectを探して格納
         TransWindow = GameObject.Find("TransWindow");
         TransWindow.SetActive(false);
+        StartWindow = GameObject.Find("StartWindow");
+        StartWindow.SetActive(true);
 
         GameOverObj = GameObject.Find("GameOverText");
         GameOverObj.GetComponent<Text>().text = "";
@@ -205,11 +211,24 @@ public class PuzzleMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (TransWindowflg)
+        if (bStartFlg)
+        {
+            // スマホのタッチと、PCのクリック判定
+            if (Input.GetMouseButtonDown(0))
+            {
+                StartWindow.SetActive(false);
+                //Vector2 pos = new Vector2(0, -170);
+                //TransWindow.transform.position = pos;
+
+                bStartFlg = false;
+            }
+            return;
+        }
+        else if (TransWindowflg)
         {
 
             TransWindow.SetActive(true);
-            Vector2 pos = new Vector2(0, -170);
+            Vector2 pos = new Vector2(0,-70);
             TransWindow.transform.position = pos;
             //Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
             //TransWindow.transform.SetParent(trans);
