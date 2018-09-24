@@ -104,7 +104,7 @@ public class StarReword
                 {
                     bstar[i] = true;
                     string str = starWord[i, 1];
-                    starWord[i, 1] = "<color='yellow'>"+str+"</color>";
+                    starWord[i, 1] = "<color='#FF9900'><b>" + str+"</b></color>";
                     star_count++;
                     bAdd = true;
 
