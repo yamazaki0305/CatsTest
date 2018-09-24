@@ -44,6 +44,10 @@ public class BlockData : MonoBehaviour
     // 7かける7のY座標
     public int Y;
 
+    // アルファ度
+    public float alpha = 1f;
+    public bool death = false;
+
 
     public void TapBlock()
     {

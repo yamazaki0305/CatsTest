@@ -266,6 +266,9 @@ public class PuzzleMain : MonoBehaviour
             return;
         }
 
+        // 救出済ねこがいないか判定
+        puzzleObjectGroup.DeathCat();
+
         //ゲームクリア判定
         if (StatusData.Cat == 0)
         {

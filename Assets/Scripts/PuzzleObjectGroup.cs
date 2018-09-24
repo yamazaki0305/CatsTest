@@ -91,6 +91,43 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
     }
 
+    public void DeathCat()
+    {
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                //空白の時
+                if (blockData[i, j])
+                {
+                    if (blockData[i, j].GetComponent<BlockData>().blockType == BlockType.CAT)
+                    {
+                        if (blockData[i, j].GetComponent<BlockData>().death)
+                        {
+                            blockData[i, j].GetComponent<BlockData>().alpha -= 0.02f;
+                            var color = blockData[i, j].GetComponent<SpriteRenderer>().color;
+                            color.a = blockData[i, j].GetComponent<BlockData>().alpha;
+                            blockData[i, j].GetComponent<SpriteRenderer>().color = color;
+
+                            if (blockData[i, j].GetComponent<BlockData>().alpha < 0)
+                            {
+                                GameObject obj = GameObject.Find("RootCanvas");
+                                obj.GetComponent<PuzzleMain>().StatusData.Cat--;
+                                obj.GetComponent<PuzzleMain>().StatusUpdate();
+
+                                // 残り時間が無くなったら自分自身を消滅
+                                GameObject.Destroy(blockData[i, j]);
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+    }
+
+
     //現在選択中のブロックを全てキャンセル
     public void SelectAllCanceled()
     {
