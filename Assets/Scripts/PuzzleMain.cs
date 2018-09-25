@@ -107,7 +107,7 @@ public class StarReword
                     starWord[i, 1] = "<color='#FF9900'><b>" + str+"</b></color>";
                     star_count++;
                     bAdd = true;
-
+ 
                 }
                 b = true;
             }
@@ -138,6 +138,11 @@ public class StarReword
 
 public class PuzzleMain : MonoBehaviour
 {
+    // SEを所得
+    public AudioClip soundBlockBreak;
+    public AudioClip soundClear;
+    public AudioClip soundStar;
+    private AudioSource audioSource;
 
     public GameObject EigoButton;
 
@@ -243,9 +248,15 @@ public class PuzzleMain : MonoBehaviour
             //スターリワードをチェック
             StarData.StarCheck(EigoText);
 
+
             // スマホのタッチと、PCのクリック判定
             if (Input.GetMouseButtonDown(0))
             {
+
+                audioSource = this.GetComponent<AudioSource>();
+                audioSource.clip = soundBlockBreak;
+                audioSource.Play();
+
                 TransWindowflg = false;
                 TransWindow.SetActive(false);
 
@@ -267,13 +278,19 @@ public class PuzzleMain : MonoBehaviour
         }
 
         // 救出済ねこがいないか判定
-        puzzleObjectGroup.DeathCat();
+        if( puzzleObjectGroup.DeathCat() )
+        {
+            audioSource = this.GetComponent<AudioSource>();
+            audioSource.clip = soundStar;
+            audioSource.Play();
+        }
 
         //ゲームクリア判定
         if (StatusData.Cat == 0)
         {
             GameOverObj.GetComponent<Text>().text = "GameClear!!";
             GameOverObj.SetActive(true);
+
         }
         //ゲームーバー判定
         else if (StatusData.Hand == 0)

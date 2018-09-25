@@ -109,8 +109,9 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
     }
 
-    public void DeathCat()
+    public bool DeathCat()
     {
+        bool b = false;
         for (int i = 0; i < columnLength; i++)
         {
             for (int j = 0; j < rowLength; j++)
@@ -135,6 +136,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                                 // 残り時間が無くなったら自分自身を消滅
                                 GameObject.Destroy(blockData[i, j]);
+                                b = true;
                             }
                         }
 
@@ -143,6 +145,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
             }
         }
+        return b;
     }
 
 
