@@ -142,6 +142,9 @@ public class PuzzleMain : MonoBehaviour
     public AudioClip soundBlockBreak;
     public AudioClip soundClear;
     public AudioClip soundStar;
+    public AudioClip soundTap;
+    public AudioClip soundOK;
+    public AudioClip soundCancel;
     private AudioSource audioSource;
 
     public GameObject EigoButton;
@@ -312,6 +315,10 @@ public class PuzzleMain : MonoBehaviour
             {
                 if (collition2d.tag == "Block")
                 {
+                    audioSource = this.GetComponent<AudioSource>();
+                    audioSource.clip = soundTap;
+                    audioSource.Play();
+
                     blockData = collition2d.GetComponent<BlockData>();
 
                     if (blockData.blockType == BlockType.ALPHABET)
@@ -471,6 +478,10 @@ public class PuzzleMain : MonoBehaviour
 
         if (btnFlg == ButtonFlg.PRESSED)
         {
+            audioSource = this.GetComponent<AudioSource>();
+            audioSource.clip = soundCancel;
+            audioSource.Play();
+
             EigoText = "";
             EigoButton.GetComponentInChildren<Text>().text = EigoText;
             puzzleObjectGroup.SelectAllCanceled();
@@ -480,6 +491,10 @@ public class PuzzleMain : MonoBehaviour
         }
         else if (btnFlg == ButtonFlg.EIGO)
         {
+            audioSource = this.GetComponent<AudioSource>();
+            audioSource.clip = soundOK;
+            audioSource.Play();
+
             TransWindowflg = true;
             /*
             StatusData.Score += EigoText.Length * 10;
