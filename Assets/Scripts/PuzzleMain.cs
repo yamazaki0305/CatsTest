@@ -199,6 +199,7 @@ public class PuzzleMain : MonoBehaviour
         //Splitで一行づつを代入した1次配列を作成
         ignore_word = TextLines.Split('\n'); //
 
+        /*
         for (int i = 0; i < ignore_word.Length; i++)
         {
             Debug.Log("無視" + ignore_word[i]);
@@ -206,6 +207,7 @@ public class PuzzleMain : MonoBehaviour
                 Debug.Log("Error");
 
         }
+        */
 
         //★ミッションの設定
         StarData = new  StarReword("ANIMAL", "[名]動物", "PEOPLE", "[名]人々", "CHECK", "[動]確認する");
@@ -462,15 +464,15 @@ public class PuzzleMain : MonoBehaviour
         //除外英単語の時はjudge=falseにする
         if (judge)
         {
-            Debug.Log("英単語:"+eigoword);
-            Debug.Log("無視数:" + ignore_word.Length);
+            //Debug.Log("英単語:"+eigoword);
+            //Debug.Log("無視数:" + ignore_word.Length);
 
             for (int i = 0; i < ignore_word.Length; i++)
             {
-                Debug.Log("英単語:" + eigoword + "無視:" + ignore_word[i]);
+                //Debug.Log("英単語:" + eigoword + "無視:" + ignore_word[i]);
                 if (ignore_word[i].ToString() == eigoword)
                 {
-                    Debug.Log("false");
+                    //Debug.Log("false");
                     judge = false;
                 }
             }
@@ -533,6 +535,9 @@ public class PuzzleMain : MonoBehaviour
             btnFlg = ButtonFlg.NORMAL;
 
             ButtonColorChange(button);
+
+            //ブロックデータリストをクリア
+            blockDataList.Clear();
         }
         else if (btnFlg == ButtonFlg.EIGO)
         {
@@ -541,6 +546,10 @@ public class PuzzleMain : MonoBehaviour
             audioSource.Play();
 
             TransWindowflg = true;
+
+            //ブロックデータリストをクリア
+            blockDataList.Clear();
+
             /*
             StatusData.Score += EigoText.Length * 10;
             StatusData.Hand--;
@@ -554,8 +563,7 @@ public class PuzzleMain : MonoBehaviour
             */
         }
 
-        //ブロックデータリストをクリア
-        blockDataList.Clear();
+  
 
     }
 

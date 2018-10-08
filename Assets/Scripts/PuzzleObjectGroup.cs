@@ -127,7 +127,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     {
                         if (blockData[i, j].GetComponent<BlockData>().death)
                         {
-                            blockData[i, j].GetComponent<BlockData>().alpha -= 0.02f;
+                            blockData[i, j].GetComponent<BlockData>().alpha -= 0.01f;
                             var color = blockData[i, j].GetComponent<SpriteRenderer>().color;
                             color.a = blockData[i, j].GetComponent<BlockData>().alpha;
                             blockData[i, j].GetComponent<SpriteRenderer>().color = color;
@@ -202,6 +202,8 @@ public class PuzzleObjectGroup : MonoBehaviour {
     //現在選択中の英語ブロックを消す
     public void SelectEigoDestroy()
     {
+        List<BlockData> blockDataList = new List<BlockData>();
+
         for (int i = 0; i < columnLength; i++)
         {
             for (int j = 0; j < rowLength; j++)
@@ -210,34 +212,77 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 {
                     if (blockData[i, j].GetComponent<BlockData>().EigoFlg)
                     {
+                        blockDataList.Add(blockData[i, j].GetComponent<BlockData>());
                         Destroy(blockData[i, j]);
-                        
+                        blockData[i, j] = null;
                     }
 
                 }
 
             }
         }
+        Debug.Log("配列数:" + blockDataList.Count);
 
-        /*
+        for (int k = 0; k < blockDataList.Count; k++)
+        {
+
+            Debug.Log("X" + blockDataList[k].X + "Y:" + blockDataList[k].Y);
+        }
+
+        //blockDataの空白を探す
         for (int i = 0; i < columnLength; i++)
         {
             for (int j = 0; j < rowLength; j++)
             {
-                if (blockData[i, j] != null)
+                if (blockData[i, j] == null && MaskData[i, j] != null)
                 {
-                    if (blockData[i, j].GetComponent<BlockData>().EigoFlg)
-                    {
-                        Destroy(blockData[i, j]);
+                    Debug.Log("空白x:" + i + "y:" + j);
 
+
+                    for (int k = 1; j + k < rowLength; k++)
+                    {
+                        //Debug.Log("x:" + i + "y:" + (j + k));
+
+                        if (blockData[i, j + k] != null)
+                        {
+                            blockData[i, j + k].GetComponent<BlockData>().X = i;
+                            blockData[i, j + k].GetComponent<BlockData>().Y = j;
+                            blockData[i, j] = blockData[i, j + k];
+                            //Destroy(blockData[i, j+k]);
+                            blockData[i, j + k] = null;
+
+                            // 生成したGameObjectをヒエラルキーに表示
+                            Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
+                            blockData[i, j].transform.SetParent(puzzleTransform);
+                            blockData[i, j].transform.position = pos;
+                            blockData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+
+                            k = 100;
+
+                        }
                     }
+
+
 
                 }
 
             }
         }
-        */
+
+        //地面に到着した猫を探す
+        for (int i = 0; i < columnLength; i++)
+        {
+            if (blockData[i, 0] != null)
+            {
+                if (blockData[i, 0].GetComponent<BlockData>().blockType == BlockType.CAT)
+                {
+                    blockData[i, 0].GetComponent<BlockData>().death = true;
+
+                }
+            }
+        }
     }
+
     // ステージのブロックを作成
     public void stageMaker()
     {
