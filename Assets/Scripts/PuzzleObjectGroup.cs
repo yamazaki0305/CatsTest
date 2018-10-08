@@ -218,6 +218,25 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
             }
         }
+
+        /*
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                if (blockData[i, j] != null)
+                {
+                    if (blockData[i, j].GetComponent<BlockData>().EigoFlg)
+                    {
+                        Destroy(blockData[i, j]);
+
+                    }
+
+                }
+
+            }
+        }
+        */
     }
     // ステージのブロックを作成
     public void stageMaker()
