@@ -181,11 +181,31 @@ public class PuzzleMain : MonoBehaviour
     //DBの定義
     SqliteDatabase sqlDB;
 
+    //無視英単語リスト
+    string[] ignore_word;
+
     // リストを作っている
     private List<BlockData> blockDataList = new List<BlockData>();
 
     void Start()
     {
+
+        //無視英単語リストを設定する
+        //　テキストファイルから読み込んだデータ
+        TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
+        textasset = Resources.Load("ignore_word", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        string TextLines = textasset.text; //テキスト全体をstring型で入れる変数を用意して入れる
+
+        //Splitで一行づつを代入した1次配列を作成
+        ignore_word = TextLines.Split('\n'); //
+
+        for (int i = 0; i < ignore_word.Length; i++)
+        {
+            Debug.Log("無視" + ignore_word[i]);
+            if (ignore_word[i] == "Se")
+                Debug.Log("Error");
+
+        }
 
         //★ミッションの設定
         StarData = new  StarReword("ANIMAL", "[名]動物", "PEOPLE", "[名]人々", "CHECK", "[動]確認する");
@@ -383,8 +403,11 @@ public class PuzzleMain : MonoBehaviour
 
     bool EigoJudgement()
     {
-        //英単語になったかの判定は2文字以上から
+        //英単語になったかの判定(2文字以上の時)
         bool judge = false;
+        //英単語になったときの単語
+        string eigoword="temp";
+
         if (EigoText.Length >= 2)
         {
             string eigo = EigoText.ToLowerInvariant();
@@ -395,16 +418,21 @@ public class PuzzleMain : MonoBehaviour
             foreach (DataRow dr in dataTable.Rows)
             {
                 judge = true;
+ 
                 string word = (string)dr["word"];
                 string str = (string)dr["mean"];
+
+                eigoword = word;
                 // attack = (int)dr["attack"];
+
                 Debug.Log("word:" + word);
                 Debug.Log("mean:" + str);
 
                 TransText += str;
 
             }
-            if( judge == false)
+
+            if ( judge == false)
             {
                 //全て小文字にする
                 string inStr = EigoText.ToLowerInvariant();
@@ -422,17 +450,34 @@ public class PuzzleMain : MonoBehaviour
                     string word = (string)dr["word"];
                     string str = (string)dr["mean"];
                     // attack = (int)dr["attack"];
-                    Debug.Log("word:" + word);
-                    Debug.Log("mean:" + str);
+                    eigoword = word;
 
                     TransText += str;
 
                 }
             }
         }
+    
 
+        //除外英単語の時はjudge=falseにする
+        if (judge)
+        {
+            Debug.Log("英単語:"+eigoword);
+            Debug.Log("無視数:" + ignore_word.Length);
 
-        //英単語になった時=現在は４文字以上で英単語と判定する
+            for (int i = 0; i < ignore_word.Length; i++)
+            {
+                Debug.Log("英単語:" + eigoword + "無視:" + ignore_word[i]);
+                if (ignore_word[i].ToString() == eigoword)
+                {
+                    Debug.Log("false");
+                    judge = false;
+                }
+            }
+
+        }
+
+        //英単語になった時にボタンの色を変える
         if (judge)
         {
             btnFlg = ButtonFlg.EIGO;

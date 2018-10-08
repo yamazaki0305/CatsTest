@@ -15,7 +15,11 @@ public class PuzzleObjectGroup : MonoBehaviour {
     //ステージの縦、横大きさ
     //private int Hsize = 7;
     //private int Wsize = 7;
-    public int test = 1;
+
+    // 余白のサイズ
+    private int margin = 5;
+
+
     public Transform puzzleTransform;
 
     //public Sprite[] puzzleSprites;
@@ -50,7 +54,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 if (stageData[i, j] != "")
                 {
 
-                    Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+                    Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
 
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
                     MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
@@ -74,7 +78,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                 if (stageData[i, j] != "")
                 { 
 
-                    Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+                    Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
 
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
                     blockData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
