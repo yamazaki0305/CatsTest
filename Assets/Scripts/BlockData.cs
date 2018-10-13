@@ -22,7 +22,10 @@ public enum BlockType
 
 public class BlockData : MonoBehaviour
 {
-     
+
+    // 余白のサイズ
+    private int margin = 5;
+
     //public Sprite[]BlockSprites;
     public Sprite[] Sprites;
 
@@ -47,7 +50,6 @@ public class BlockData : MonoBehaviour
     // アルファ度
     public float alpha = 1f;
     public bool death = false;
-
 
     public void TapBlock()
     {

@@ -27,10 +27,10 @@ public class PuzzleObjectGroup : MonoBehaviour {
     public GameObject puzzlePrefab;
     public GameObject MaskPrefab;
 
-    // 7列のデータを作成している。このブロックのデータでゲームを制御
-    public GameObject[,] blockData;
+    // 7列のパズルデータを作成。このパズルのデータでゲームを制御
+    public GameObject[,] PuzzleData;
 
-    // 7列のデータを作成している。このブロックのデータでゲームを制御
+    // 7列のパズルデータのエリア内を作成（Mask）
     public GameObject[,] MaskData;
 
     public string[,] stageData;
@@ -59,7 +59,6 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
                     MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
 
-
                     MaskData[i, j].name = "Mask";
                     MaskData[i, j].transform.SetParent(puzzleTransform);
                     MaskData[i, j].transform.position = pos;
@@ -81,23 +80,23 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
 
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
-                    blockData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
+                    PuzzleData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
                     if (stageData[i, j] == "cat")
                     {
-                        blockData[i, j].GetComponent<BlockData>().setup(BlockType.CAT, stageData[i, j], false, i, j);
-                        blockData[i, j].name = "Cat"; // GameObjectの名前を決めている
+                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.CAT, stageData[i, j], false, i, j);
+                        PuzzleData[i, j].name = "Cat"; // GameObjectの名前を決めている
 
                     }
                     else
                     {
-                        blockData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
-                        blockData[i, j].name = "Block"; // GameObjectの名前を決めている
+                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
+                        PuzzleData[i, j].name = "Block"; // GameObjectの名前を決めている
                     }
 
                     // 生成したGameObjectをヒエラルキーに表示
-                    blockData[i, j].transform.SetParent(puzzleTransform);
-                    blockData[i, j].transform.position = pos;
-                    blockData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+                    PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                    PuzzleData[i, j].transform.position = pos;
+                    PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
 
 
 
@@ -121,25 +120,25 @@ public class PuzzleObjectGroup : MonoBehaviour {
             for (int j = 0; j < rowLength; j++)
             {
                 //空白の時
-                if (blockData[i, j])
+                if (PuzzleData[i, j])
                 {
-                    if (blockData[i, j].GetComponent<BlockData>().blockType == BlockType.CAT)
+                    if (PuzzleData[i, j].GetComponent<BlockData>().blockType == BlockType.CAT)
                     {
-                        if (blockData[i, j].GetComponent<BlockData>().death)
+                        if (PuzzleData[i, j].GetComponent<BlockData>().death && PuzzleData[i, j].GetComponent<Liner>().iMove == false )
                         {
-                            blockData[i, j].GetComponent<BlockData>().alpha -= 0.01f;
-                            var color = blockData[i, j].GetComponent<SpriteRenderer>().color;
-                            color.a = blockData[i, j].GetComponent<BlockData>().alpha;
-                            blockData[i, j].GetComponent<SpriteRenderer>().color = color;
+                            PuzzleData[i, j].GetComponent<BlockData>().alpha -= 0.01f;
+                            var color = PuzzleData[i, j].GetComponent<SpriteRenderer>().color;
+                            color.a = PuzzleData[i, j].GetComponent<BlockData>().alpha;
+                            PuzzleData[i, j].GetComponent<SpriteRenderer>().color = color;
 
-                            if (blockData[i, j].GetComponent<BlockData>().alpha < 0)
+                            if (PuzzleData[i, j].GetComponent<BlockData>().alpha < 0)
                             {
                                 GameObject obj = GameObject.Find("RootCanvas");
                                 obj.GetComponent<PuzzleMain>().StatusData.Cat--;
                                 obj.GetComponent<PuzzleMain>().StatusUpdate();
 
                                 // 残り時間が無くなったら自分自身を消滅
-                                GameObject.Destroy(blockData[i, j]);
+                                GameObject.Destroy(PuzzleData[i, j]);
                                 b = true;
                             }
                         }
@@ -160,14 +159,14 @@ public class PuzzleObjectGroup : MonoBehaviour {
         {
             for (int j = 0; j < rowLength; j++)
             {
-                if (blockData[i, j] != null)
+                if (PuzzleData[i, j] != null)
                 {
-                    if( blockData[i, j].GetComponent<BlockData>().Selected )
+                    if( PuzzleData[i, j].GetComponent<BlockData>().Selected )
                     {
-                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(false,false);
+                        PuzzleData[i, j].GetComponent<BlockData>().ChangeBlock(false,false);
                         Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
-                        blockData[i, j].transform.SetParent(puzzleTransform);
-                        //blockData[i, j].transform.position = pos;
+                        PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                        //PuzzleData[i, j].transform.position = pos;
                     }
 
                 }
@@ -183,15 +182,15 @@ public class PuzzleObjectGroup : MonoBehaviour {
         {
             for (int j = 0; j < rowLength; j++)
             {
-                if (blockData[i, j] != null)
+                if (PuzzleData[i, j] != null)
                 {
-                    if (blockData[i, j].GetComponent<BlockData>().Selected)
+                    if (PuzzleData[i, j].GetComponent<BlockData>().Selected)
                     {
                         
-                        blockData[i, j].GetComponent<BlockData>().ChangeBlock(true,true);
+                        PuzzleData[i, j].GetComponent<BlockData>().ChangeBlock(true,true);
                         Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
-                        blockData[i, j].transform.SetParent(puzzleTransform);
-                        //blockData[i, j].transform.position = pos;
+                        PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                        //PuzzleData[i, j].transform.position = pos;
                     }
 
                 }
@@ -208,55 +207,57 @@ public class PuzzleObjectGroup : MonoBehaviour {
         {
             for (int j = 0; j < rowLength; j++)
             {
-                if (blockData[i, j] != null)
+                if (PuzzleData[i, j] != null)
                 {
-                    if (blockData[i, j].GetComponent<BlockData>().EigoFlg)
+                    if (PuzzleData[i, j].GetComponent<BlockData>().EigoFlg)
                     {
-                        blockDataList.Add(blockData[i, j].GetComponent<BlockData>());
-                        Destroy(blockData[i, j]);
-                        blockData[i, j] = null;
+                        blockDataList.Add(PuzzleData[i, j].GetComponent<BlockData>());
+                        Destroy(PuzzleData[i, j]);
+                        PuzzleData[i, j] = null;
                     }
 
                 }
 
             }
         }
-        Debug.Log("配列数:" + blockDataList.Count);
 
-        for (int k = 0; k < blockDataList.Count; k++)
-        {
 
-            Debug.Log("X" + blockDataList[k].X + "Y:" + blockDataList[k].Y);
-        }
-
-        //blockDataの空白を探す
+        //PuzzleDataの空白を探す
         for (int i = 0; i < columnLength; i++)
         {
             for (int j = 0; j < rowLength; j++)
             {
-                if (blockData[i, j] == null && MaskData[i, j] != null)
+                //PuzzleDataが空白の時
+                if (PuzzleData[i, j] == null && MaskData[i, j] != null)
                 {
-                    Debug.Log("空白x:" + i + "y:" + j);
 
-
+                    //空白PuzzleDataのブロックの上にブロックがないかrowLengthまで調べる
                     for (int k = 1; j + k < rowLength; k++)
                     {
-                        //Debug.Log("x:" + i + "y:" + (j + k));
 
-                        if (blockData[i, j + k] != null)
+                        //もしNULL以外のPuzzleDataのブロックが見つかった時
+                        if (PuzzleData[i, j + k] != null)
                         {
-                            blockData[i, j + k].GetComponent<BlockData>().X = i;
-                            blockData[i, j + k].GetComponent<BlockData>().Y = j;
-                            blockData[i, j] = blockData[i, j + k];
-                            //Destroy(blockData[i, j+k]);
-                            blockData[i, j + k] = null;
+                            //PuzzleDataのX,Yのマスの位置を現在→新しい位置に更新
+                            PuzzleData[i, j + k].GetComponent<BlockData>().X = i;
+                            PuzzleData[i, j + k].GetComponent<BlockData>().Y = j;
 
-                            // 生成したGameObjectをヒエラルキーに表示
+                            //空白PuzzleDataの空白に見つかったPuzzleDataのブロックを代入
+                            PuzzleData[i, j] = PuzzleData[i, j + k];
+
+                            //空白のPuzzleDataに代入したので代入元のデータをnullにする
+                            PuzzleData[i, j + k] = null;
+
+                            //PuzzleDataのブロックの表示座標を更新する
                             Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
-                            blockData[i, j].transform.SetParent(puzzleTransform);
-                            blockData[i, j].transform.position = pos;
-                            blockData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
 
+                            PuzzleData[i, j].transform.SetParent(puzzleTransform);
+
+                            PuzzleData[i, j].GetComponent<Liner>().OnMove(pos, k);
+                            //PuzzleData[i, j].transform.position = pos;
+                            PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+
+                            // 空白PuzzleDataのブロックの上にブロックがないかrowLengthまで調べるのを終了
                             k = 100;
 
                         }
@@ -272,11 +273,11 @@ public class PuzzleObjectGroup : MonoBehaviour {
         //地面に到着した猫を探す
         for (int i = 0; i < columnLength; i++)
         {
-            if (blockData[i, 0] != null)
+            if (PuzzleData[i, 0] != null)
             {
-                if (blockData[i, 0].GetComponent<BlockData>().blockType == BlockType.CAT)
+                if (PuzzleData[i, 0].GetComponent<BlockData>().blockType == BlockType.CAT)
                 {
-                    blockData[i, 0].GetComponent<BlockData>().death = true;
+                    PuzzleData[i, 0].GetComponent<BlockData>().death = true;
 
                 }
             }
@@ -306,7 +307,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
         Debug.Log("columnLength:" + columnLength);
 
         // 7列のデータを作成している。このブロックのデータでゲームを制御
-        blockData = new GameObject[columnLength, rowLength];
+        PuzzleData = new GameObject[columnLength, rowLength];
 
         // 7列のデータを作成している。このブロックのデータでゲームを制御
         MaskData = new GameObject[columnLength, rowLength];
