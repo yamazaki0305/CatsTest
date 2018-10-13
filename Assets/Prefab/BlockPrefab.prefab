@@ -40,6 +40,7 @@ GameObject:
   - component: {fileID: 222058783928860212}
   - component: {fileID: 61843030325174990}
   - component: {fileID: 114897769708576626}
+  - component: {fileID: 114754447450229554}
   m_Layer: 0
   m_Name: BlockPrefab
   m_TagString: Block
@@ -125,6 +126,20 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4278190080
+--- !u!114 &114754447450229554
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1469833672120550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e18648a0499c2f240b18fb85a5cbe1e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  time: 0
+  endPosition: {x: 0, y: 0}
+  iMove: 0
 --- !u!114 &114897769708576626
 MonoBehaviour:
   m_ObjectHideFlags: 1
