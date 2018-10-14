@@ -22,7 +22,7 @@ public class Liner : MonoBehaviour
     {
 
         // 1マスを0,5秒で移動
-        time = d * 0.5f;
+        time = d * 0.3f;
 
         if (time <= 0)
         {

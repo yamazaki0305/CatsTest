@@ -278,9 +278,11 @@ public class PuzzleMain : MonoBehaviour
             if (Input.GetMouseButtonDown(0))
             {
 
+                /*
                 audioSource = this.GetComponent<AudioSource>();
                 audioSource.clip = soundBlockBreak;
                 audioSource.Play();
+                */
 
                 TransWindowflg = false;
                 TransWindow.SetActive(false);
@@ -305,9 +307,11 @@ public class PuzzleMain : MonoBehaviour
         // 救出済ねこがいないか判定
         if( puzzleObjectGroup.DeathCat() )
         {
+            /*
             audioSource = this.GetComponent<AudioSource>();
             audioSource.clip = soundStar;
             audioSource.Play();
+            */
         }
 
         //ゲームクリア判定
@@ -541,26 +545,23 @@ public class PuzzleMain : MonoBehaviour
         }
         else if (btnFlg == ButtonFlg.EIGO)
         {
+
+
+            AudioSource a1;
+            AudioClip audio = Resources.Load("SOUND/SE/decision4", typeof(AudioClip)) as AudioClip;
+            a1 = gameObject.AddComponent<AudioSource>();
+            a1.clip = audio;
+            a1.Play();
+            /*
             audioSource = this.GetComponent<AudioSource>();
             audioSource.clip = soundOK;
             audioSource.Play();
+            */
 
             TransWindowflg = true;
 
             //ブロックデータリストをクリア
             blockDataList.Clear();
-
-            /*
-            StatusData.Score += EigoText.Length * 10;
-            StatusData.Hand--;
-            StatusUpdate();
-            EigoText = "";
-            EigoButton.GetComponentInChildren<Text>().text = EigoText;
-            puzzleObjectGroup.SelectEigoDestroy();
-            btnFlg = ButtonFlg.NORMAL;
-
-            ButtonColorChange(button);
-            */
         }
 
   

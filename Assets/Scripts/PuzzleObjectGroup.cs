@@ -126,6 +126,17 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     {
                         if (PuzzleData[i, j].GetComponent<BlockData>().death && PuzzleData[i, j].GetComponent<Liner>().iMove == false )
                         {
+
+                            // 救出処理開始時
+                            if (PuzzleData[i, j].GetComponent<BlockData>().alpha == 1.0f)
+                            {
+                                AudioSource a1;
+                                AudioClip audio = Resources.Load("SOUND/SE/cat1", typeof(AudioClip)) as AudioClip;
+                                a1 = gameObject.AddComponent<AudioSource>();
+                                a1.clip = audio;
+                                a1.Play();
+                            }
+
                             PuzzleData[i, j].GetComponent<BlockData>().alpha -= 0.01f;
                             var color = PuzzleData[i, j].GetComponent<SpriteRenderer>().color;
                             color.a = PuzzleData[i, j].GetComponent<BlockData>().alpha;
