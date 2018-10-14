@@ -30,6 +30,12 @@ public class EigoButtonController : MonoBehaviour
         scaling = false;
     }
 
+    public void OnClick()
+    {
+        Debug.Log("Click");
+
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -41,7 +47,7 @@ public class EigoButtonController : MonoBehaviour
         }
         else
         {
-            this.transform.localScale = new Vector2(this.transform.localScale.x, this.transform.localScale.y);
+            this.transform.localScale = new Vector2(1, 1);
         }
         
     }
