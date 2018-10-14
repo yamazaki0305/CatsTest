@@ -579,6 +579,8 @@ public class PuzzleMain : MonoBehaviour
             colors.disabledColor = new Color(204f / 255f, 0f / 255f, 0f / 255f, 255f / 255f);
 
             EigoButton.GetComponent<Button>().colors = colors;
+
+            EigoButton.GetComponent<EigoButtonController>().scaling = false;
         }
         else if (btnFlg == ButtonFlg.NORMAL)
         {
@@ -589,6 +591,8 @@ public class PuzzleMain : MonoBehaviour
             colors.disabledColor = new Color(200f / 255f, 200f / 255f, 200f / 255f, 255f / 255f);
 
             EigoButton.GetComponent<Button>().colors = colors;
+
+            EigoButton.GetComponent<EigoButtonController>().scaling = false;
         }
         else if (btnFlg == ButtonFlg.EIGO)
         {
@@ -600,7 +604,7 @@ public class PuzzleMain : MonoBehaviour
 
             EigoButton.GetComponent<Button>().colors = colors;
 
-
+            EigoButton.GetComponent<EigoButtonController>().scaling = true;
 
         }
     }
