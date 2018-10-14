@@ -258,12 +258,12 @@ public class PuzzleMain : MonoBehaviour
         {
 
             TransWindow.SetActive(true);
-            Vector2 pos = new Vector2(0,-70);
+            Vector2 pos = new Vector2(0, -70);
+            Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
+            TransWindow.transform.SetParent(trans);
             TransWindow.transform.position = pos;
-            //Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
-            //TransWindow.transform.SetParent(trans);
 
-            Debug.Log("z:" + TransWindow.transform.position.z);
+            Debug.Log("x:" + TransWindow.transform.position.x + "y:" + TransWindow.transform.position.y);
 
             Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
             EngText.GetComponent<Text>().text = EigoText;
