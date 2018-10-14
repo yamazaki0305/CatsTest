@@ -264,7 +264,8 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                             PuzzleData[i, j].transform.SetParent(puzzleTransform);
 
-                            PuzzleData[i, j].GetComponent<Liner>().OnMove(pos, k);
+                            //PuzzleData[i, j].GetComponent<Liner>().OnMove(pos, k);
+                            PuzzleData[i, j].GetComponent<Liner>().OnStart(pos, k);
                             //PuzzleData[i, j].transform.position = pos;
                             PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
 
