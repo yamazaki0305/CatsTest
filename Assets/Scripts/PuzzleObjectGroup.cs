@@ -61,7 +61,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                     MaskData[i, j].name = "Mask";
                     MaskData[i, j].transform.SetParent(puzzleTransform);
-                    MaskData[i, j].transform.position = pos;
+					MaskData[i, j].transform.localPosition = pos;
                     MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
 
                 }
@@ -95,7 +95,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                     // 生成したGameObjectをヒエラルキーに表示
                     PuzzleData[i, j].transform.SetParent(puzzleTransform);
-                    PuzzleData[i, j].transform.position = pos;
+					PuzzleData[i, j].transform.localPosition = pos;
                     PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
 
 
