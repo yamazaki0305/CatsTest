@@ -258,10 +258,10 @@ public class PuzzleMain : MonoBehaviour
         {
 
             TransWindow.SetActive(true);
-//            Vector2 pos = new Vector2(0, -70);
+            Vector2 pos = new Vector2(0, -70);
 //            Transform trans = GameObject.Find("RootCanvas").GetComponent<Transform>();
 //            TransWindow.transform.SetParent(trans);
-//            TransWindow.transform.position = pos;
+            TransWindow.transform.position = pos;
 
             Debug.Log("x:" + TransWindow.transform.position.x + "y:" + TransWindow.transform.position.y);
 

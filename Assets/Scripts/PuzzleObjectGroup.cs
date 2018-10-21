@@ -144,7 +144,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                             if (PuzzleData[i, j].GetComponent<BlockData>().alpha < 0)
                             {
-                                GameObject obj = GameObject.Find("RootCanvas");
+                                GameObject obj = GameObject.Find("GameRoot");
                                 obj.GetComponent<PuzzleMain>().StatusData.Cat--;
                                 obj.GetComponent<PuzzleMain>().StatusUpdate();
 
