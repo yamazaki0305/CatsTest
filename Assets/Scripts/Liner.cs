@@ -24,11 +24,11 @@ public class Liner : MonoBehaviour
 
         // 距離によってアニメーションの時間を変化
         float duration = 0f;
-        float def = 1.2f;
+        float def = 1.0f;
         for(int i=0;i<k;i++)
         {
             duration += def;
-            def = def * 0.5f;
+            def = def * 0.4f;
         }
 
         /*
