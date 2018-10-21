@@ -158,7 +158,11 @@ public class PuzzleMain : MonoBehaviour
     [SerializeField]
     PuzzleObjectGroup puzzleObjectGroup = null;
 
+    // ボタンに表示する英語（全て大文字）
     private string EigoText;
+    // TransWindowに表示する英単語
+    private string TransEigoText;
+    // TransWindowに表示する英単語の翻訳
     private string TransText;
     // EigoTextの状態を保持(NORMAL/PRESSED/EIGO)
     public ButtonFlg btnFlg;
@@ -198,16 +202,6 @@ public class PuzzleMain : MonoBehaviour
 
         //Splitで一行づつを代入した1次配列を作成
         ignore_word = TextLines.Split('\n'); //
-
-        /*
-        for (int i = 0; i < ignore_word.Length; i++)
-        {
-            Debug.Log("無視" + ignore_word[i]);
-            if (ignore_word[i] == "Se")
-                Debug.Log("Error");
-
-        }
-        */
 
         //★ミッションの設定
         StarData = new  StarReword("ANIMAL", "[名]動物", "PEOPLE", "[名]人々", "CHECK", "[動]確認する");
@@ -261,12 +255,13 @@ public class PuzzleMain : MonoBehaviour
             Vector2 pos = new Vector2(0, -70);
 //            Transform trans = GameObject.Find("RootCanvas").GetComponent<Transform>();
 //            TransWindow.transform.SetParent(trans);
-            TransWindow.transform.position = pos;
+            TransWindow.transform.localPosition = pos;
 
             Debug.Log("x:" + TransWindow.transform.position.x + "y:" + TransWindow.transform.position.y);
 
+
             Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
-            EngText.GetComponent<Text>().text = EigoText;
+            EngText.GetComponent<Text>().text = TransEigoText;
             Text JapText = GameObject.Find("JapWord").GetComponent<Text>();
             JapText.GetComponent<Text>().text = TransText;
 
@@ -429,7 +424,6 @@ public class PuzzleMain : MonoBehaviour
                 string str = (string)dr["mean"];
 
                 eigoword = word;
-                // attack = (int)dr["attack"];
 
                 Debug.Log("word:" + word);
                 Debug.Log("mean:" + str);
@@ -468,8 +462,6 @@ public class PuzzleMain : MonoBehaviour
         //除外英単語の時はjudge=falseにする
         if (judge)
         {
-            //Debug.Log("英単語:"+eigoword);
-            //Debug.Log("無視数:" + ignore_word.Length);
 
             for (int i = 0; i < ignore_word.Length; i++)
             {
@@ -492,8 +484,7 @@ public class PuzzleMain : MonoBehaviour
                 blockDataList[i].ChangeBlock(true, true);
             }
             puzzleObjectGroup.SelectEigoChange();
-
-
+            TransEigoText = eigoword;
         }
         else if (EigoText.Length == 0)
         {
@@ -513,6 +504,7 @@ public class PuzzleMain : MonoBehaviour
         }
         var button = EigoButton.GetComponent<Button>();
         ButtonColorChange(button);
+
 
         return judge;
     }
