@@ -51,7 +51,7 @@ public class Liner : MonoBehaviour
         }
         */
 
-        startPosition = transform.position;
+        startPosition = transform.localPosition;
         // この関数を呼び出すとオブジェクトが移動する
         StartCoroutine(MoveTo(startPosition, toPos, duration));
     }
@@ -72,7 +72,7 @@ public class Liner : MonoBehaviour
 
             float easingValue = EasingLerps.EasingLerp(EasingLerps.EasingLerpsType.Bounce, EasingLerps.EasingInOutType.EaseOut, time, 0, 1);
             Vector3 lerpValue = Vector3.Lerp(fromPos, toPos, easingValue);
-            this.transform.position = lerpValue;
+            this.transform.localPosition = lerpValue;
 
             if (time == 1)
             {
@@ -84,6 +84,7 @@ public class Liner : MonoBehaviour
         }
     }
 
+    /*
     public void OnMove(Vector2 endpos, int d)
     {
 
@@ -104,7 +105,7 @@ public class Liner : MonoBehaviour
 
         iMove = true;
     }
-
+    */
 
     void Update()
     {
