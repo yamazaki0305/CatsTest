@@ -226,9 +226,9 @@ public class PuzzleMain : MonoBehaviour
 
         EigoText = "";
         TransText = "";
-        //EigoText.GetComponent<Text>().text = "";
 
-
+        // 音声ファイルを設定
+        soundTap = Resources.Load("SOUND/SE/cursor1", typeof(AudioClip)) as AudioClip;
 
     }
 

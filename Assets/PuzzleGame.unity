@@ -608,12 +608,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8852c84d0726ab4cb17f9502609a3eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundBlockBreak: {fileID: 8300000, guid: 4f92605dd7bd948b5b76ce036f8737c3, type: 3}
-  soundClear: {fileID: 8300000, guid: bf0a411ade55c484fabca91abd600959, type: 3}
-  soundStar: {fileID: 8300000, guid: ee8f032abdedc4966aad2ea5e8ea6ac8, type: 3}
-  soundTap: {fileID: 8300000, guid: ea9bfb7d056ec9c4ab513affb7bc726c, type: 3}
-  soundOK: {fileID: 8300000, guid: 5f86673ee4529694d9237000d434e9a5, type: 3}
-  soundCancel: {fileID: 8300000, guid: bb7396a9b37a7914891c80792a101816, type: 3}
+  soundBlockBreak: {fileID: 0}
+  soundClear: {fileID: 0}
+  soundStar: {fileID: 0}
+  soundTap: {fileID: 0}
+  soundOK: {fileID: 0}
+  soundCancel: {fileID: 0}
   EigoButton: {fileID: 2050965428}
   StatusCat: {fileID: 564731713}
   StatusHand: {fileID: 1719438081}
