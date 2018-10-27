@@ -267,6 +267,7 @@ public class PuzzleMain : MonoBehaviour
         {
 
             TransWindow.SetActive(true);
+
             Vector2 pos = new Vector2(0, -580);
             Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
             TransWindow.transform.SetParent(trans);
@@ -291,30 +292,42 @@ public class PuzzleMain : MonoBehaviour
             //スターリワードをチェック
             StarData.StarCheck(EigoText);
 
+            var button = EigoButton.GetComponent<Button>();
 
-            // スマホのタッチと、PCのクリック判定
             if (Input.GetMouseButtonDown(0))
             {
-                // ブロック移動中処理に移行
-                GameFlg = GameLoopFlg.BlockMove;
-
-                TransWindow.SetActive(false);
-
-
-                var button = EigoButton.GetComponent<Button>();
-
                 StatusData.Score += EigoText.Length * 10;
                 StatusData.Hand--;
                 StatusUpdate();
                 EigoText = "";
                 EigoButton.GetComponentInChildren<Text>().text = EigoText;
+            
+            /*
+            for (int i = 0; i<blockDataList.Count(); i++)
+            {
+                Destroy(blockDataList[i]);
+                blockDataList[i] = null;
+            }
+            */
+                //StartCoroutine(puzzleObjectGroup.SelectEigoDestroy());
                 puzzleObjectGroup.SelectEigoDestroy();
+
                 btnFlg = ButtonFlg.NORMAL;
 
-                ButtonColorChange(button);
-            }
+                // ブロック移動中処理に移行
+                GameFlg = GameLoopFlg.BlockMove;
 
-            return;
+                ButtonColorChange(button);
+
+
+                //ブロックデータリストをクリア
+                blockDataList.Clear();
+
+                // 和訳の表示をしない
+                TransWindow.SetActive(false);
+
+                return;
+            }
         }
         // ブロック移動中処理
         else if (GameFlg == GameLoopFlg.BlockMove)
@@ -583,7 +596,7 @@ public class PuzzleMain : MonoBehaviour
             GameFlg = GameLoopFlg.Translate;
 
             //ブロックデータリストをクリア
-            blockDataList.Clear();
+            //blockDataList.Clear();
         }
 
   

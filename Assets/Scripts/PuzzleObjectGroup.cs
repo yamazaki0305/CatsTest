@@ -216,6 +216,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
     {
         List<BlockData> blockDataList = new List<BlockData>();
 
+        
         for (int i = 0; i < columnLength; i++)
         {
             for (int j = 0; j < rowLength; j++)
@@ -227,12 +228,14 @@ public class PuzzleObjectGroup : MonoBehaviour {
                         blockDataList.Add(PuzzleData[i, j].GetComponent<BlockData>());
                         Destroy(PuzzleData[i, j]);
                         PuzzleData[i, j] = null;
+                        //yield return new WaitForSeconds(0.2f);
                     }
 
                 }
 
             }
         }
+        
 
 
         //PuzzleDataの空白を探す
