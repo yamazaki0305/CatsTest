@@ -252,7 +252,7 @@ public class PuzzleMain : MonoBehaviour
         {
 
             TransWindow.SetActive(true);
-            Vector2 pos = new Vector2(0, -550);
+            Vector2 pos = new Vector2(0, -580);
             Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
             TransWindow.transform.SetParent(trans);
             TransWindow.transform.localPosition = pos;
@@ -267,9 +267,9 @@ public class PuzzleMain : MonoBehaviour
             // スペースを取り除く
             string str = TransText.Replace(" ", "").Replace("　", "");
 
-            //先頭から13行✕3列分の文字列を取得
-            if (str.Length > 39)
-                str = str.Substring(0, 39);
+            //先頭から12行✕3列分の文字列を取得
+            if (str.Length > 36)
+                str = str.Substring(0, 36);
 
             JapText.GetComponent<Text>().text = str;
 
