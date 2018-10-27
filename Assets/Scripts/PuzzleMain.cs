@@ -198,10 +198,12 @@ public class PuzzleMain : MonoBehaviour
     string[] ignore_word;
 
     // リストを作っている
-    private List<BlockData> blockDataList = new List<BlockData>();
+    private List<GameObject> PuzzleDataList = new List<GameObject>();
 
     // ゲームループフラグを管理
-    GameLoopFlg GameFlg = GameLoopFlg.PlayBefore; 
+    GameLoopFlg GameFlg = GameLoopFlg.PlayBefore;
+
+    bool isRunning = true;
 
     void Start()
     {
@@ -266,6 +268,7 @@ public class PuzzleMain : MonoBehaviour
         else if (GameFlg == GameLoopFlg.Translate)
         {
 
+            
             TransWindow.SetActive(true);
 
             Vector2 pos = new Vector2(0, -580);
@@ -278,6 +281,7 @@ public class PuzzleMain : MonoBehaviour
 
             Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
             EngText.GetComponent<Text>().text = TransEigoText;
+
             Text JapText = GameObject.Find("JapWord").GetComponent<Text>();
 
             // スペースを取り除く
@@ -291,51 +295,49 @@ public class PuzzleMain : MonoBehaviour
 
             //スターリワードをチェック
             StarData.StarCheck(EigoText);
+            EigoText = "";
+            EigoButton.GetComponentInChildren<Text>().text = EigoText;
 
             var button = EigoButton.GetComponent<Button>();
 
-            if (Input.GetMouseButtonDown(0))
-            {
-                StatusData.Score += EigoText.Length * 10;
-                StatusData.Hand--;
-                StatusUpdate();
-                EigoText = "";
-                EigoButton.GetComponentInChildren<Text>().text = EigoText;
+//            if (Input.GetMouseButtonDown(0))
+//            {
             
-            /*
-            for (int i = 0; i<blockDataList.Count(); i++)
-            {
-                Destroy(blockDataList[i]);
-                blockDataList[i] = null;
-            }
-            */
-                //StartCoroutine(puzzleObjectGroup.SelectEigoDestroy());
-                puzzleObjectGroup.SelectEigoDestroy();
+                StartCoroutine(BreakBlockCoroutine());
 
-                btnFlg = ButtonFlg.NORMAL;
+                if (isRunning == false)
+                {
+                    StatusData.Score += EigoText.Length * 10;
+                    StatusData.Hand--;
+                    StatusUpdate();
 
-                // ブロック移動中処理に移行
-                GameFlg = GameLoopFlg.BlockMove;
+                    puzzleObjectGroup.SelectEigoDestroy();
 
-                ButtonColorChange(button);
+                    btnFlg = ButtonFlg.NORMAL;
 
+                    // ブロック移動中処理に移行
+                    GameFlg = GameLoopFlg.BlockMove;
+                    isRunning = true;
 
-                //ブロックデータリストをクリア
-                blockDataList.Clear();
+                    ButtonColorChange(button);
 
-                // 和訳の表示をしない
-                TransWindow.SetActive(false);
+                    //ブロックデータリストをクリア
+                    PuzzleDataList.Clear();
 
                 return;
-            }
+                }
+ //           }
         }
         // ブロック移動中処理
         else if (GameFlg == GameLoopFlg.BlockMove)
         {
             // 救出済ねこがいない時、移動中のブロックがない時
-            if ( puzzleObjectGroup.DeathCat()==false )
+            if (puzzleObjectGroup.CheckBlockMove() == false )
             {
-                if (puzzleObjectGroup.CheckBlockMove() == false)
+                // 和訳の表示をしない
+                TransWindow.SetActive(false);
+
+                if (puzzleObjectGroup.DeathCat() == false)
                 {
                     GameFlg = GameLoopFlg.PlayNow;
                 }
@@ -387,7 +389,7 @@ public class PuzzleMain : MonoBehaviour
                         {
                             if (!blockData.Selected)
                             {
-                                blockDataList.Add(blockData);
+                                PuzzleDataList.Add(collition2d.gameObject);
 
                                 blockData.TapBlock();
 
@@ -418,14 +420,14 @@ public class PuzzleMain : MonoBehaviour
                             }
                             else
                             {
-                                int x = blockDataList[blockDataList.Count - 1].X;
-                                int y = blockDataList[blockDataList.Count - 1].Y;
+                                int x = PuzzleDataList[PuzzleDataList.Count - 1].GetComponent<BlockData>().X;
+                                int y = PuzzleDataList[PuzzleDataList.Count - 1].GetComponent<BlockData>().Y;
 
                                 // 最後にタップしたブロックの選択を解除
                                 if (blockData.X == x && blockData.Y == y)
                                 {
-                                    blockDataList[blockDataList.Count - 1].ChangeBlock(false, false);
-                                    blockDataList.RemoveRange(blockDataList.Count - 1, 1);
+                                    PuzzleDataList[PuzzleDataList.Count - 1].GetComponent<BlockData>().ChangeBlock(false, false);
+                                    PuzzleDataList.RemoveRange(PuzzleDataList.Count - 1, 1);
 
                                     //末尾から1文字削除する
                                     EigoText = EigoText.Remove(EigoText.Length - 1, 1);
@@ -444,7 +446,17 @@ public class PuzzleMain : MonoBehaviour
 
     }
 
-    bool EigoJudgement()
+    IEnumerator  BreakBlockCoroutine()
+    {
+        for (int i = 0; i < PuzzleDataList.Count(); i++)
+        {
+            PuzzleDataList[i].SetActive(false);
+            yield return new WaitForSeconds(0.25f);
+        }
+        isRunning = false;
+    }
+
+bool EigoJudgement()
     {
         //英単語になったかの判定(2文字以上の時)
         bool judge = false;
@@ -521,9 +533,9 @@ public class PuzzleMain : MonoBehaviour
         if (judge)
         {
             btnFlg = ButtonFlg.EIGO;
-            for (int i = 0; i < blockDataList.Count; i++)
+            for (int i = 0; i < PuzzleDataList.Count; i++)
             {
-                blockDataList[i].ChangeBlock(true, true);
+                PuzzleDataList[i].GetComponent<BlockData>().ChangeBlock(true, true);
             }
             puzzleObjectGroup.SelectEigoChange();
             TransEigoText = eigoword;
@@ -539,9 +551,9 @@ public class PuzzleMain : MonoBehaviour
         {
             TransText = "";
             btnFlg = ButtonFlg.PRESSED;
-            for (int i = 0; i < blockDataList.Count; i++)
+            for (int i = 0; i < PuzzleDataList.Count; i++)
             {
-                blockDataList[i].ChangeBlock(true, false);
+                PuzzleDataList[i].GetComponent<BlockData>().ChangeBlock(true, false);
             }
         }
         var button = EigoButton.GetComponent<Button>();
@@ -575,7 +587,7 @@ public class PuzzleMain : MonoBehaviour
             ButtonColorChange(button);
 
             //ブロックデータリストをクリア
-            blockDataList.Clear();
+            PuzzleDataList.Clear();
         }
         else if (btnFlg == ButtonFlg.EIGO)
         {
@@ -640,6 +652,7 @@ public class PuzzleMain : MonoBehaviour
             EigoButton.GetComponent<Button>().colors = colors;
 
             EigoButton.GetComponent<EigoButtonController>().scaling = true;
+            isRunning = true;
 
         }
     }

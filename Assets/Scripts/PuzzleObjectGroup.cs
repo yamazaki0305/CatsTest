@@ -235,7 +235,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
             }
         }
-        
+            
 
 
         //PuzzleDataの空白を探す
