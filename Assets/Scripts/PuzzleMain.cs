@@ -453,7 +453,7 @@ public class PuzzleMain : MonoBehaviour
         {
 
             PuzzleDataList[i].GetComponent<SpriteRenderer>().sprite = null;
-            PuzzleDataList[i].GetComponentInChildren<TextMesh>().GetComponent<EigoWordController>().scaling = true;
+            PuzzleDataList[i].GetComponentInChildren<TextMesh>().GetComponent<EigoWordController>().breakFlg = true;
             yield return new WaitForSeconds(0.16f);
 
         }
@@ -522,7 +522,6 @@ bool EigoJudgement()
                 }
             }
         }
-    
 
         //除外英単語の時はjudge=falseにする
         if (judge)
@@ -550,6 +549,11 @@ bool EigoJudgement()
             }
             puzzleObjectGroup.SelectEigoChange();
             TransEigoText = eigoword;
+
+            for (int i = 0; i < PuzzleDataList.Count(); i++)
+            {
+                PuzzleDataList[i].GetComponentInChildren<TextMesh>().GetComponent<EigoWordController>().scalingFlg = true;
+            }
         }
         else if (EigoText.Length == 0)
         {
@@ -565,6 +569,11 @@ bool EigoJudgement()
             for (int i = 0; i < PuzzleDataList.Count; i++)
             {
                 PuzzleDataList[i].GetComponent<BlockData>().ChangeBlock(true, false);
+            }
+
+            for (int i = 0; i < PuzzleDataList.Count(); i++)
+            {
+                PuzzleDataList[i].GetComponentInChildren<TextMesh>().GetComponent<EigoWordController>().scalingFlg = false;
             }
         }
         var button = EigoButton.GetComponent<Button>();
