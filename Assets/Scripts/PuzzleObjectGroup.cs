@@ -126,6 +126,8 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     {
                         if (PuzzleData[i, j].GetComponent<BlockData>().death && PuzzleData[i, j].GetComponent<Liner>().iMove == false )
                         {
+                            //消せる猫がいる時はreturn trueにする
+                            b = true;
 
                             // 救出処理開始時
                             if (PuzzleData[i, j].GetComponent<BlockData>().alpha == 1.0f)
@@ -150,7 +152,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
                                 // 残り時間が無くなったら自分自身を消滅
                                 GameObject.Destroy(PuzzleData[i, j]);
-                                b = true;
+                                
                             }
                         }
 
@@ -296,8 +298,31 @@ public class PuzzleObjectGroup : MonoBehaviour {
         }
     }
 
-    // ステージのブロックを作成
-    public void stageMaker()
+    // 移動中のブロックがないかチェック true:移動中、false:移動中なし
+    public bool CheckBlockMove()
+    {
+        //PuzzleDataが移動中か調べる
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                //空白のPuzzleData以外の時
+                if (PuzzleData[i, j] != null)
+                {
+                    //PuzzleDataが移動中の時
+                    if (PuzzleData[i, j].GetComponent<Liner>().iMove == true)
+                    {
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return false;
+
+    }
+        // ステージのブロックを作成
+        public void stageMaker()
     {
 
 

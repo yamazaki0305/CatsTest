@@ -24,7 +24,7 @@ public enum GameLoopFlg
 {
     PlayBefore, //ステージ紹介中
     PlayNow,    //プレイ中
-    Translaete, //和訳表示中（ブロックを消す）
+    Translate, //和訳表示中（ブロックを消す）
     BlockMove,  //ブロック移動中
     PlayEnd,    //プレイ終了（クリア、ゲームオーバー）
     Pause,      //一時停止中
@@ -187,11 +187,9 @@ public class PuzzleMain : MonoBehaviour
 
     //英訳のWindow
     private GameObject TransWindow;
-    bool TransWindowflg = false;
 
     //ゲーム開始前の処理
     private GameObject StartWindow;
-    bool bStartFlg = true;
 
     //DBの定義
     SqliteDatabase sqlDB;
@@ -249,7 +247,8 @@ public class PuzzleMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (bStartFlg)
+        // ゲーム開始前処理
+        if (GameFlg == GameLoopFlg.PlayBefore)
         {
             // スマホのタッチと、PCのクリック判定
             if (Input.GetMouseButtonDown(0))
@@ -258,11 +257,13 @@ public class PuzzleMain : MonoBehaviour
                 //Vector2 pos = new Vector2(0, -170);
                 //TransWindow.transform.position = pos;
 
-                bStartFlg = false;
+                // プレイ中処理に移行
+                GameFlg = GameLoopFlg.PlayNow;
             }
             return;
         }
-        else if (TransWindowflg)
+        // 和訳表示中処理
+        else if (GameFlg == GameLoopFlg.Translate)
         {
 
             TransWindow.SetActive(true);
@@ -294,14 +295,9 @@ public class PuzzleMain : MonoBehaviour
             // スマホのタッチと、PCのクリック判定
             if (Input.GetMouseButtonDown(0))
             {
+                // ブロック移動中処理に移行
+                GameFlg = GameLoopFlg.BlockMove;
 
-                /*
-                audioSource = this.GetComponent<AudioSource>();
-                audioSource.clip = soundBlockBreak;
-                audioSource.Play();
-                */
-
-                TransWindowflg = false;
                 TransWindow.SetActive(false);
 
 
@@ -320,101 +316,112 @@ public class PuzzleMain : MonoBehaviour
 
             return;
         }
-
-        // 救出済ねこがいないか判定
-        if( puzzleObjectGroup.DeathCat() )
+        // ブロック移動中処理
+        else if (GameFlg == GameLoopFlg.BlockMove)
         {
-            /*
-            audioSource = this.GetComponent<AudioSource>();
-            audioSource.clip = soundStar;
-            audioSource.Play();
-            */
-        }
-
-        //ゲームクリア判定
-        if (StatusData.Cat == 0)
-        {
-            GameOverObj.GetComponent<Text>().text = "GameClear!!";
-            GameOverObj.SetActive(true);
-
-        }
-        //ゲームーバー判定
-        else if (StatusData.Hand == 0)
-        {
-            GameOverObj.GetComponent<Text>().text = "GameOver!!";
-            GameOverObj.SetActive(true);
-        }
-
-        // スマホのタッチと、PCのクリック判定
-        if (Input.GetMouseButtonDown(0))
-        {
-            Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Collider2D collition2d = Physics2D.OverlapPoint(point);
-
-            BlockData blockData;
-
-            // ここでRayが当たったGameObjectを取得できる
-            if (collition2d)
+            // 救出済ねこがいない時、移動中のブロックがない時
+            if ( puzzleObjectGroup.DeathCat()==false )
             {
-                if (collition2d.tag == "Block")
+                if (puzzleObjectGroup.CheckBlockMove() == false)
                 {
-                    audioSource = this.GetComponent<AudioSource>();
-                    audioSource.clip = soundTap;
-                    audioSource.Play();
+                    GameFlg = GameLoopFlg.PlayNow;
+                }
+                /*
+                audioSource = this.GetComponent<AudioSource>();
+                audioSource.clip = soundStar;
+                audioSource.Play();
+                */
+            }
+        }
+        // ゲーム中処理
+        else if (GameFlg == GameLoopFlg.PlayNow)
+        {
 
-                    blockData = collition2d.GetComponent<BlockData>();
+            //ゲームクリア判定
+            if (StatusData.Cat == 0)
+            {
+                GameOverObj.GetComponent<Text>().text = "GameClear!!";
+                GameOverObj.SetActive(true);
 
-                    if (blockData.blockType == BlockType.ALPHABET)
+            }
+            //ゲームーバー判定
+            else if (StatusData.Hand == 0)
+            {
+                GameOverObj.GetComponent<Text>().text = "GameOver!!";
+                GameOverObj.SetActive(true);
+            }
+
+            // スマホのタッチと、PCのクリック判定
+            if (Input.GetMouseButtonDown(0))
+            {
+                Vector2 point = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Collider2D collition2d = Physics2D.OverlapPoint(point);
+
+                BlockData blockData;
+
+                // ここでRayが当たったGameObjectを取得できる
+                if (collition2d)
+                {
+                    if (collition2d.tag == "Block")
                     {
-                        if (!blockData.Selected)
+                        audioSource = this.GetComponent<AudioSource>();
+                        audioSource.clip = soundTap;
+                        audioSource.Play();
+
+                        blockData = collition2d.GetComponent<BlockData>();
+
+                        if (blockData.blockType == BlockType.ALPHABET)
                         {
-                            blockDataList.Add(blockData);
-
-                            blockData.TapBlock();
-
-                            // ここでRayが当たったGameObjectを取得できる
-                            EigoText += blockData.Alphabet;
-                            EigoButton.GetComponentInChildren<Text>().text = EigoText;
-                            //                            Debug.Log(EigoText);
-
-                            //英単語になったかの判定
-                            bool judge = EigoJudgement();
-
-                            //英単語になった時
-                            if (judge)
+                            if (!blockData.Selected)
                             {
-                                btnFlg = ButtonFlg.EIGO;
-                                puzzleObjectGroup.SelectEigoChange();
+                                blockDataList.Add(blockData);
 
+                                blockData.TapBlock();
+
+                                // ここでRayが当たったGameObjectを取得できる
+                                EigoText += blockData.Alphabet;
+                                EigoButton.GetComponentInChildren<Text>().text = EigoText;
+                                //                            Debug.Log(EigoText);
+
+                                //英単語になったかの判定
+                                bool judge = EigoJudgement();
+
+                                //英単語になった時
+                                if (judge)
+                                {
+                                    btnFlg = ButtonFlg.EIGO;
+                                    puzzleObjectGroup.SelectEigoChange();
+
+
+                                }
+                                //英単語ではない
+                                else
+                                {
+                                    btnFlg = ButtonFlg.PRESSED;
+                                }
+                                var button = EigoButton.GetComponent<Button>();
+                                ButtonColorChange(button);
 
                             }
-                            //英単語ではない
                             else
                             {
-                                btnFlg = ButtonFlg.PRESSED;
-                            }
-                            var button = EigoButton.GetComponent<Button>();
-                            ButtonColorChange(button);
+                                int x = blockDataList[blockDataList.Count - 1].X;
+                                int y = blockDataList[blockDataList.Count - 1].Y;
 
-                        }
-                        else
-                        {
-                            int x = blockDataList[blockDataList.Count - 1].X;
-                            int y = blockDataList[blockDataList.Count - 1].Y;
+                                // 最後にタップしたブロックの選択を解除
+                                if (blockData.X == x && blockData.Y == y)
+                                {
+                                    blockDataList[blockDataList.Count - 1].ChangeBlock(false, false);
+                                    blockDataList.RemoveRange(blockDataList.Count - 1, 1);
 
-                            // 最後にタップしたブロックの選択を解除
-                            if (blockData.X == x && blockData.Y == y)
-                            {
-                                blockDataList[blockDataList.Count - 1].ChangeBlock(false,false);
-                                blockDataList.RemoveRange(blockDataList.Count-1, 1);
-
-                                //末尾から1文字削除する
-                                EigoText = EigoText.Remove(EigoText.Length - 1, 1);
-                                EigoButton.GetComponentInChildren<Text>().text = EigoText;
-                                EigoJudgement();
+                                    //末尾から1文字削除する
+                                    EigoText = EigoText.Remove(EigoText.Length - 1, 1);
+                                    EigoButton.GetComponentInChildren<Text>().text = EigoText;
+                                    EigoJudgement();
 
 
 
+                                }
                             }
                         }
                     }
@@ -572,7 +579,8 @@ public class PuzzleMain : MonoBehaviour
             audioSource.Play();
             */
 
-            TransWindowflg = true;
+            // 和訳表示処理に移行
+            GameFlg = GameLoopFlg.Translate;
 
             //ブロックデータリストをクリア
             blockDataList.Clear();
