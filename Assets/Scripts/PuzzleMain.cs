@@ -448,10 +448,21 @@ public class PuzzleMain : MonoBehaviour
 
     IEnumerator  BreakBlockCoroutine()
     {
+        
+        for (int i = 0; i < PuzzleDataList.Count(); i++)
+        {
+
+            PuzzleDataList[i].GetComponent<SpriteRenderer>().sprite = null;
+            PuzzleDataList[i].GetComponentInChildren<TextMesh>().GetComponent<EigoWordController>().scaling = true;
+            yield return new WaitForSeconds(0.16f);
+
+        }
+        
         for (int i = 0; i < PuzzleDataList.Count(); i++)
         {
             PuzzleDataList[i].SetActive(false);
-            yield return new WaitForSeconds(0.25f);
+            //PuzzleDataList[i].GetComponentInChildren<Text>().fontSize = 80;
+            //yield return new WaitForSeconds(0.25f);
         }
         isRunning = false;
     }
