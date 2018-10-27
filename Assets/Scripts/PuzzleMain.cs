@@ -19,6 +19,17 @@ public enum ButtonFlg
     EIGO = 3,
 }
 
+// ゲームループを定義
+public enum GameLoopFlg
+{
+    PlayBefore, //ステージ紹介中
+    PlayNow,    //プレイ中
+    Translaete, //和訳表示中（ブロックを消す）
+    BlockMove,  //ブロック移動中
+    PlayEnd,    //プレイ終了（クリア、ゲームオーバー）
+    Pause,      //一時停止中
+}
+
 public class StageStatus
 {
     public int Cat;
@@ -190,6 +201,9 @@ public class PuzzleMain : MonoBehaviour
 
     // リストを作っている
     private List<BlockData> blockDataList = new List<BlockData>();
+
+    // ゲームループフラグを管理
+    GameLoopFlg GameFlg = GameLoopFlg.PlayBefore; 
 
     void Start()
     {
