@@ -252,9 +252,9 @@ public class PuzzleMain : MonoBehaviour
         {
 
             TransWindow.SetActive(true);
-            Vector2 pos = new Vector2(0, -70);
-//            Transform trans = GameObject.Find("RootCanvas").GetComponent<Transform>();
-//            TransWindow.transform.SetParent(trans);
+            Vector2 pos = new Vector2(0, -550);
+            Transform trans = GameObject.Find("UICanvas").GetComponent<Transform>();
+            TransWindow.transform.SetParent(trans);
             TransWindow.transform.localPosition = pos;
 
             Debug.Log("x:" + TransWindow.transform.position.x + "y:" + TransWindow.transform.position.y);
@@ -263,7 +263,15 @@ public class PuzzleMain : MonoBehaviour
             Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
             EngText.GetComponent<Text>().text = TransEigoText;
             Text JapText = GameObject.Find("JapWord").GetComponent<Text>();
-            JapText.GetComponent<Text>().text = TransText;
+
+            // スペースを取り除く
+            string str = TransText.Replace(" ", "").Replace("　", "");
+
+            //先頭から13行✕3列分の文字列を取得
+            if (str.Length > 39)
+                str = str.Substring(0, 39);
+
+            JapText.GetComponent<Text>().text = str;
 
             //スターリワードをチェック
             StarData.StarCheck(EigoText);
