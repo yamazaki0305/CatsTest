@@ -284,7 +284,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
         //　テキストファイルからデータを読み込む
         TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
-        textasset = Resources.Load("stage2", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        textasset = Resources.Load("stage1", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
         string TextLines = textasset.text; //テキスト全体をstring型で入れる変数を用意して入れる
 
         //Splitで一行づつを代入した1次配列を作成
@@ -294,6 +294,12 @@ public class PuzzleObjectGroup : MonoBehaviour {
         string[] columstr = textMessage[0].Split(',');
         columnLength = columstr.Length-1;
         rowLength = textMessage.Length;
+
+        // 画面に出すブロックの縦数は最大7にする
+        if (rowLength > 7)
+            DefaultBlockHeight = 7;
+        else
+            DefaultBlockHeight = rowLength;
 
         // ステージ用のテキストファイルを２次元配列データに格納する用の２次元配列を作成
         stageData = new string[columnLength, rowLength];
