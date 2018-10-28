@@ -807,8 +807,6 @@ public class PuzzleMain : MonoBehaviour
     public void stageMaker()
     {
 
-
-
         //　テキストファイルからデータを読み込む
         TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
         textasset = Resources.Load("stage2", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
