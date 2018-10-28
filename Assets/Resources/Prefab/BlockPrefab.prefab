@@ -120,7 +120,7 @@ TextMesh:
   m_Anchor: 4
   m_Alignment: 1
   m_TabSize: 4
-  m_FontSize: 65
+  m_FontSize: 68
   m_FontStyle: 0
   m_RichText: 1
   m_Font: {fileID: 0}
@@ -236,7 +236,7 @@ RectTransform:
   m_GameObject: {fileID: 1469833672120550}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 1}
-  m_LocalScale: {x: 88, y: 88, z: 1}
+  m_LocalScale: {x: 82, y: 82, z: 1}
   m_Children:
   - {fileID: 224921009655630148}
   m_Father: {fileID: 0}

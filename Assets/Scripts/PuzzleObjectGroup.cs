@@ -12,13 +12,21 @@ using UnityEngine.SceneManagement;
 
 public class PuzzleObjectGroup : MonoBehaviour {
 
-    //ステージの縦、横大きさ
-    //private int Hsize = 7;
-    //private int Wsize = 7;
 
-    // 余白のサイズ
-    private int margin = 5;
+    //英語ブロックのサイズを指定
+    private int BlockSize = 85;
 
+    //英語ブロックの1段目の高さ
+    private int BlockGroundHeight = -250;
+
+    //デフォルトの高さのマス
+    private int DefaultBlockHeight = 7;
+
+    //地面に到着して猫を消すマスの高さ
+    public int DeathBlockHeight = 0;
+
+    //プレイヤーがタップ出来るPuzzleDataのマスの高さ
+    public int ActiveBlockHeight = 0;
 
     public Transform puzzleTransform;
 
@@ -45,64 +53,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
         stageMaker();
 
-        for (int i = 0; i < columnLength; i++)
-        {
-            for (int j = 0; j < rowLength; j++)
-            {
-
-                //空白の時
-                if (stageData[i, j] != "")
-                {
-
-                    Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
-
-                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
-                    MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
-
-                    MaskData[i, j].name = "Mask";
-                    MaskData[i, j].transform.SetParent(puzzleTransform);
-					MaskData[i, j].transform.localPosition = pos;
-                    MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
-
-                }
-            }
-        }
-
-        for (int i = 0; i < columnLength; i++)
-        {
-            for (int j = 0; j < rowLength; j++)
-            {
-
-                //空白の時
-                if (stageData[i, j] != "")
-                { 
-
-                    Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
-
-                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
-                    PuzzleData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
-                    if (stageData[i, j] == "cat")
-                    {
-                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.CAT, stageData[i, j], false, i, j);
-                        PuzzleData[i, j].name = "Cat"; // GameObjectの名前を決めている
-
-                    }
-                    else
-                    {
-                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
-                        PuzzleData[i, j].name = "Block"; // GameObjectの名前を決めている
-                    }
-
-                    // 生成したGameObjectをヒエラルキーに表示
-                    PuzzleData[i, j].transform.SetParent(puzzleTransform);
-					PuzzleData[i, j].transform.localPosition = pos;
-                    PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
-
-
-
-                }
-            }
-        }
+        ActiveBlockHeight = rowLength - DefaultBlockHeight;
 
     }
 
@@ -177,7 +128,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     if( PuzzleData[i, j].GetComponent<BlockData>().Selected )
                     {
                         PuzzleData[i, j].GetComponent<BlockData>().ChangeBlock(false,false);
-                        Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+                        Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
                         PuzzleData[i, j].transform.SetParent(puzzleTransform);
                         //PuzzleData[i, j].transform.position = pos;
                     }
@@ -201,7 +152,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                     {
                         
                         PuzzleData[i, j].GetComponent<BlockData>().ChangeBlock(true,true);
-                        Vector2 pos = new Vector2(i * 90 - 320 + 45, j * 90 - 270);
+                        Vector2 pos = new Vector2(i * BlockSize - 320 + 45, j * BlockSize - 270);
                         PuzzleData[i, j].transform.SetParent(puzzleTransform);
                         //PuzzleData[i, j].transform.position = pos;
                     }
@@ -265,7 +216,7 @@ public class PuzzleObjectGroup : MonoBehaviour {
                             PuzzleData[i, j + k] = null;
 
                             //PuzzleDataのブロックの表示座標を更新する
-                            Vector2 pos = new Vector2(i * 90 - 320 + 45 + margin, j * 90 - 270);
+                            Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
 
                             PuzzleData[i, j].transform.SetParent(puzzleTransform);
 
@@ -290,11 +241,11 @@ public class PuzzleObjectGroup : MonoBehaviour {
         //地面に到着した猫を探す
         for (int i = 0; i < columnLength; i++)
         {
-            if (PuzzleData[i, 0] != null)
+            if (PuzzleData[i, DeathBlockHeight] != null)
             {
-                if (PuzzleData[i, 0].GetComponent<BlockData>().blockType == BlockType.CAT)
+                if (PuzzleData[i, DeathBlockHeight].GetComponent<BlockData>().blockType == BlockType.CAT)
                 {
-                    PuzzleData[i, 0].GetComponent<BlockData>().death = true;
+                    PuzzleData[i, DeathBlockHeight].GetComponent<BlockData>().death = true;
 
                 }
             }
@@ -324,13 +275,14 @@ public class PuzzleObjectGroup : MonoBehaviour {
         return false;
 
     }
-        // ステージのブロックを作成
-        public void stageMaker()
+
+    // ステージのブロックを作成
+    public void stageMaker()
     {
 
 
 
-        //　テキストファイルから読み込んだデータ
+        //　テキストファイルからデータを読み込む
         TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
         textasset = Resources.Load("stage2", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
         string TextLines = textasset.text; //テキスト全体をstring型で入れる変数を用意して入れる
@@ -343,19 +295,18 @@ public class PuzzleObjectGroup : MonoBehaviour {
         columnLength = columstr.Length-1;
         rowLength = textMessage.Length;
 
-        Debug.Log("rowLength:" + rowLength);
-        Debug.Log("columnLength:" + columnLength);
-
-        // 7列のデータを作成している。このブロックのデータでゲームを制御
-        PuzzleData = new GameObject[columnLength, rowLength];
-
-        // 7列のデータを作成している。このブロックのデータでゲームを制御
-        MaskData = new GameObject[columnLength, rowLength];
-
+        // ステージ用のテキストファイルを２次元配列データに格納する用の２次元配列を作成
         stageData = new string[columnLength, rowLength];
 
-    //2次配列を定義
-    textWords = new string[rowLength, columnLength];
+        // stageDataから空き枠以外をMaskDataに格納する用の２次元配列を作成
+        MaskData = new GameObject[columnLength, rowLength];
+
+        // stageDataから英語ブロック、猫などを格納する用の２次元配列を作成 
+        PuzzleData = new GameObject[columnLength, rowLength];
+
+
+        //2次配列を定義
+        textWords = new string[rowLength, columnLength];
 
         for (int i = 0; i < rowLength; i++)
         {
@@ -403,6 +354,72 @@ public class PuzzleObjectGroup : MonoBehaviour {
             }
             k--;
         }
+
+
+        // stageDataからMaskDataを作成する
+
+
+        // stageDataからMaskDataを作成する
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+
+                //空白の時
+                if (stageData[i, j] != "")
+                {
+
+                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight)* BlockSize );
+
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
+
+                    MaskData[i, j].name = "Mask";
+                    MaskData[i, j].transform.SetParent(puzzleTransform);
+                    MaskData[i, j].transform.localPosition = pos;
+                    MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
+
+                }
+            }
+        }
+
+        // stageDataからPuzzleDataを作成する
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+
+                //空白の時
+                if (stageData[i, j] != "")
+                {
+                    
+                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength)/2 + BlockSize/2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                    //Vector2 pos = new Vector2(i * BlockSize - 320 + 45 + margin, j * BlockSize - 270);
+
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    PuzzleData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
+                    if (stageData[i, j] == "cat")
+                    {
+                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.CAT, stageData[i, j], false, i, j);
+                        PuzzleData[i, j].name = "Cat"; // GameObjectの名前を決めている
+
+                    }
+                    else
+                    {
+                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
+                        PuzzleData[i, j].name = "Block"; // GameObjectの名前を決めている
+                    }
+
+                    // 生成したGameObjectをヒエラルキーに表示
+                    PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                    PuzzleData[i, j].transform.localPosition = pos;
+                    PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+
+                }
+            }
+        }
+
 
     }
 

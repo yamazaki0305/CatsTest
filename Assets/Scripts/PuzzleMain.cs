@@ -231,12 +231,17 @@ public class PuzzleMain : MonoBehaviour
 
     bool isRunning = true;
 
+    // 画面に表示されないブロックの縦数を表示するGameObject
+    private GameObject UnderArrow;
+
     void Start()
     {
 
+        // 画面に表示されない縦数を見つける
+        UnderArrow = GameObject.Find("UnderArrow");
 
-        // ステージのクリア条件
-        StatusData = new StageStatus(3, 20);
+       // ステージのクリア条件
+       StatusData = new StageStatus(3, 20);
         StatusData.StatusUpdate();
 
         //無視英単語リストを設定する
@@ -278,6 +283,9 @@ public class PuzzleMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // 画面に表示されない縦数を表示する
+        UnderArrow.GetComponentInChildren<Text>().text = puzzleObjectGroup.ActiveBlockHeight.ToString();
+
         // ゲーム開始前処理
         if (GameFlg == GameLoopFlg.PlayBefore)
         {
@@ -408,43 +416,47 @@ public class PuzzleMain : MonoBehaviour
                 {
                     if (collition2d.tag == "Block")
                     {
-                        audioSource = this.GetComponent<AudioSource>();
-                        audioSource.clip = soundTap;
-                        audioSource.Play();
-
                         blockData = collition2d.GetComponent<BlockData>();
 
                         if (blockData.blockType == BlockType.ALPHABET)
                         {
                             if (!blockData.Selected)
                             {
-                                PuzzleDataList.Add(collition2d.gameObject);
-
-                                blockData.TapBlock();
-
-                                // ここでRayが当たったGameObjectを取得できる
-                                EigoText += blockData.Alphabet;
-                                EigoButton.GetComponentInChildren<Text>().text = EigoText;
-                                //                            Debug.Log(EigoText);
-
-                                //英単語になったかの判定
-                                bool judge = EigoJudgement();
-
-                                //英単語になった時
-                                if (judge)
+                                // プレイヤーがタップできるPuzzleDataのマスの高さ
+                                if (blockData.Y >= puzzleObjectGroup.ActiveBlockHeight )
                                 {
-                                    btnFlg = ButtonFlg.EIGO;
-                                    puzzleObjectGroup.SelectEigoChange();
+                                    audioSource = this.GetComponent<AudioSource>();
+                                    audioSource.clip = soundTap;
+                                    audioSource.Play();
+
+                                    PuzzleDataList.Add(collition2d.gameObject);
+
+                                    blockData.TapBlock();
+
+                                    // ここでRayが当たったGameObjectを取得できる
+                                    EigoText += blockData.Alphabet;
+                                    EigoButton.GetComponentInChildren<Text>().text = EigoText;
+                                    //                            Debug.Log(EigoText);
+
+                                    //英単語になったかの判定
+                                    bool judge = EigoJudgement();
+
+                                    //英単語になった時
+                                    if (judge)
+                                    {
+                                        btnFlg = ButtonFlg.EIGO;
+                                        puzzleObjectGroup.SelectEigoChange();
 
 
+                                    }
+                                    //英単語ではない
+                                    else
+                                    {
+                                        btnFlg = ButtonFlg.PRESSED;
+                                    }
+                                    var button = EigoButton.GetComponent<Button>();
+                                    ButtonColorChange(button);
                                 }
-                                //英単語ではない
-                                else
-                                {
-                                    btnFlg = ButtonFlg.PRESSED;
-                                }
-                                var button = EigoButton.GetComponent<Button>();
-                                ButtonColorChange(button);
 
                             }
                             else

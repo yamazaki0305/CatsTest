@@ -45,7 +45,7 @@ public class EigoWordController : MonoBehaviour {
         if (breakFlg)
         {
             fontsize++;
-            alpha += -0.015f;
+            alpha -= Time.deltaTime; // Time.deltaTime=フレームレード
             this.GetComponent<TextMesh>().fontSize = fontsize;
             this.GetComponent<TextMesh>().color = new Color(255f / 255f, 255f / 255f, 0f / 255f, alpha);
         }
