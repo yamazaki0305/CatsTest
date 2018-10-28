@@ -82,7 +82,6 @@ public class PuzzleMain : MonoBehaviour
 
     //ゲームオーバークリアの表示
     private GameObject GameOverObj;
-    // Use this for initialization
 
     //英訳のWindow
     private GameObject TransWindow;
