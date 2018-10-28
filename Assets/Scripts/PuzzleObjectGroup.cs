@@ -13,6 +13,7 @@ using UnityEngine.SceneManagement;
 public class PuzzleObjectGroup : MonoBehaviour {
 
 
+/*
     //英語ブロックのサイズを指定
     private int BlockSize = 85;
 
@@ -47,7 +48,9 @@ public class PuzzleObjectGroup : MonoBehaviour {
     public string[,] textWords; //テキストの複数列を入れる2次元は配列
     private int rowLength; //テキスト内の行数を取得する変数
     private int columnLength; //テキスト内の列数を取得する変数
+*/
 
+/*
     // Use this for initialization
     void Start () {
 
@@ -56,13 +59,14 @@ public class PuzzleObjectGroup : MonoBehaviour {
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
 
     }
-
+*/
 
     // Update is called once per frame
     void Update() {
 
     }
 
+    /*
     public bool DeathCat()
     {
         bool b = false;
@@ -428,5 +432,5 @@ public class PuzzleObjectGroup : MonoBehaviour {
 
 
     }
-
+    */
 }

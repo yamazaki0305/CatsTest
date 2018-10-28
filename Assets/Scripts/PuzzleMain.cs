@@ -14,6 +14,48 @@ using System.Globalization;
 
 public class PuzzleMain : MonoBehaviour
 {
+    /// <summary>
+    /// PuzzleObjectGroupからコピー
+    /// </summary>
+   
+    //英語ブロックのサイズを指定
+    private int BlockSize = 85;
+
+    //英語ブロックの1段目の高さ
+    private int BlockGroundHeight = -250;
+
+    //デフォルトの高さのマス
+    private int DefaultBlockHeight = 7;
+
+    //地面に到着して猫を消すマスの高さ
+    public int DeathBlockHeight = 0;
+
+    //プレイヤーがタップ出来るPuzzleDataのマスの高さ
+    public int ActiveBlockHeight = 0;
+
+    // PuzzleDataをPuzzleObjectGroup下に表示する
+    public Transform puzzleTransform;
+
+    //public Sprite[] puzzleSprites;
+
+    public GameObject puzzlePrefab;
+    public GameObject MaskPrefab;
+
+    // 7列のパズルデータを作成。このパズルのデータでゲームを制御
+    public GameObject[,] PuzzleData;
+
+    // 7列のパズルデータのエリア内を作成（Mask）
+    public GameObject[,] MaskData;
+
+    public string[,] stageData;
+
+    public string[] textMessage; //テキストの加工前の一行を入れる変数
+    public string[,] textWords; //テキストの複数列を入れる2次元は配列
+    private int rowLength; //テキスト内の行数を取得する変数
+    private int columnLength; //テキスト内の列数を取得する変数
+
+    //////////////////////////////////////////////////////////// 
+
     // SEを所得
     private AudioClip soundTap;
     private AudioClip soundCancel;
@@ -25,10 +67,6 @@ public class PuzzleMain : MonoBehaviour
     public GameObject StatusCat;
     public GameObject StatusHand;
     public GameObject StatusScore;
-
-    // パズルオブジェクトグループコンポーネント
-    [SerializeField]
-    PuzzleObjectGroup puzzleObjectGroup = null;
 
     // ボタンに表示する英語（全て大文字）
     private string EigoText;
@@ -71,6 +109,13 @@ public class PuzzleMain : MonoBehaviour
 
     void Start()
     {
+
+        /// <summary>
+        /// PuzzleObjectGroupからコピー
+        /// </summary>
+        stageMaker();
+        ActiveBlockHeight = rowLength - DefaultBlockHeight;
+        /////////////////
 
         // 画面に表示されない縦数を見つける
         UnderArrow = GameObject.Find("UnderArrow");
@@ -119,7 +164,7 @@ public class PuzzleMain : MonoBehaviour
     void Update()
     {
         // 画面に表示されない縦数を表示する
-        UnderArrow.GetComponentInChildren<Text>().text = puzzleObjectGroup.ActiveBlockHeight.ToString();
+        UnderArrow.GetComponentInChildren<Text>().text = ActiveBlockHeight.ToString();
 
         // ゲーム開始前処理
         if (GameFlg == GameLoopFlg.PlayBefore)
@@ -183,7 +228,7 @@ public class PuzzleMain : MonoBehaviour
                     EigoText = "";
                     EigoButton.GetComponentInChildren<Text>().text = EigoText;
 
-                    puzzleObjectGroup.SelectEigoDestroy();
+                    SelectEigoDestroy();
 
                     btnFlg = ButtonFlg.NORMAL;
 
@@ -204,12 +249,12 @@ public class PuzzleMain : MonoBehaviour
         else if (GameFlg == GameLoopFlg.BlockMove)
         {
             // 救出済ねこがいない時、移動中のブロックがない時
-            if (puzzleObjectGroup.CheckBlockMove() == false )
+            if (CheckBlockMove() == false )
             {
                 // 和訳の表示をしない
                 TransWindow.SetActive(false);
 
-                if (puzzleObjectGroup.DeathCat() == false)
+                if (DeathCat() == false)
                 {
                     GameFlg = GameLoopFlg.PlayNow;
                 }
@@ -258,7 +303,7 @@ public class PuzzleMain : MonoBehaviour
                             if (!blockData.Selected)
                             {
                                 // プレイヤーがタップできるPuzzleDataのマスの高さ
-                                if (blockData.Y >= puzzleObjectGroup.ActiveBlockHeight )
+                                if (blockData.Y >= ActiveBlockHeight )
                                 {
                                     audioSource = this.GetComponent<AudioSource>();
                                     audioSource.clip = soundTap;
@@ -280,7 +325,7 @@ public class PuzzleMain : MonoBehaviour
                                     if (judge)
                                     {
                                         btnFlg = ButtonFlg.EIGO;
-                                        puzzleObjectGroup.SelectEigoChange();
+                                        SelectEigoChange();
 
 
                                     }
@@ -423,7 +468,7 @@ public class PuzzleMain : MonoBehaviour
             {
                 PuzzleDataList[i].GetComponent<BlockData>().ChangeBlock(true, true);
             }
-            puzzleObjectGroup.SelectEigoChange();
+            SelectEigoChange();
             TransEigoText = eigoword;
 
             for (int i = 0; i < PuzzleDataList.Count(); i++)
@@ -475,7 +520,7 @@ public class PuzzleMain : MonoBehaviour
 
             EigoText = "";
             EigoButton.GetComponentInChildren<Text>().text = EigoText;
-            puzzleObjectGroup.SelectAllCanceled();
+            SelectAllCanceled();
             btnFlg = ButtonFlg.NORMAL;
 
             ButtonColorChange(button);
@@ -541,4 +586,375 @@ public class PuzzleMain : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// PuzzleObjectGroupからコピー
+    /// </summary>
+
+    public bool DeathCat()
+    {
+        bool b = false;
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                //空白の時
+                if (PuzzleData[i, j])
+                {
+                    if (PuzzleData[i, j].GetComponent<BlockData>().blockType == BlockType.CAT)
+                    {
+                        if (PuzzleData[i, j].GetComponent<BlockData>().death && PuzzleData[i, j].GetComponent<Liner>().iMove == false)
+                        {
+                            //消せる猫がいる時はreturn trueにする
+                            b = true;
+
+                            // 救出処理開始時
+                            if (PuzzleData[i, j].GetComponent<BlockData>().alpha == 1.0f)
+                            {
+                                AudioSource a1;
+                                AudioClip audio = Resources.Load("SOUND/SE/cat1", typeof(AudioClip)) as AudioClip;
+                                a1 = gameObject.AddComponent<AudioSource>();
+                                a1.clip = audio;
+                                a1.Play();
+                            }
+
+                            PuzzleData[i, j].GetComponent<BlockData>().alpha -= 0.01f;
+                            var color = PuzzleData[i, j].GetComponent<SpriteRenderer>().color;
+                            color.a = PuzzleData[i, j].GetComponent<BlockData>().alpha;
+                            PuzzleData[i, j].GetComponent<SpriteRenderer>().color = color;
+
+                            if (PuzzleData[i, j].GetComponent<BlockData>().alpha < 0)
+                            {
+                                GameObject obj = GameObject.Find("GameRoot");
+
+                                obj.GetComponent<PuzzleMain>().StatusData.CatUpdate();
+
+                                // 残り時間が無くなったら自分自身を消滅
+                                GameObject.Destroy(PuzzleData[i, j]);
+
+                            }
+                        }
+
+                    }
+                }
+
+            }
+        }
+        return b;
+    }
+
+
+    //現在選択中のブロックを全てキャンセル
+    public void SelectAllCanceled()
+    {
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                if (PuzzleData[i, j] != null)
+                {
+                    if (PuzzleData[i, j].GetComponent<BlockData>().Selected)
+                    {
+                        PuzzleData[i, j].GetComponent<BlockData>().ChangeBlock(false, false);
+                        Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+                        PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                        //PuzzleData[i, j].transform.position = pos;
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    //現在選択中のブロックを英単語にする
+    public void SelectEigoChange()
+    {
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                if (PuzzleData[i, j] != null)
+                {
+                    if (PuzzleData[i, j].GetComponent<BlockData>().Selected)
+                    {
+
+                        PuzzleData[i, j].GetComponent<BlockData>().ChangeBlock(true, true);
+                        Vector2 pos = new Vector2(i * BlockSize - 320 + 45, j * BlockSize - 270);
+                        PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                        //PuzzleData[i, j].transform.position = pos;
+                    }
+
+                }
+
+            }
+        }
+    }
+    //現在選択中の英語ブロックを消す
+    public void SelectEigoDestroy()
+    {
+        List<BlockData> blockDataList = new List<BlockData>();
+
+
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                if (PuzzleData[i, j] != null)
+                {
+                    if (PuzzleData[i, j].GetComponent<BlockData>().EigoFlg)
+                    {
+                        blockDataList.Add(PuzzleData[i, j].GetComponent<BlockData>());
+                        Destroy(PuzzleData[i, j]);
+                        PuzzleData[i, j] = null;
+                        //yield return new WaitForSeconds(0.2f);
+                    }
+
+                }
+
+            }
+        }
+
+
+
+        //PuzzleDataの空白を探す
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                //PuzzleDataが空白の時
+                if (PuzzleData[i, j] == null && MaskData[i, j] != null)
+                {
+
+                    //空白PuzzleDataのブロックの上にブロックがないかrowLengthまで調べる
+                    for (int k = 1; j + k < rowLength; k++)
+                    {
+
+                        //もしNULL以外のPuzzleDataのブロックが見つかった時
+                        if (PuzzleData[i, j + k] != null)
+                        {
+                            //PuzzleDataのX,Yのマスの位置を現在→新しい位置に更新
+                            PuzzleData[i, j + k].GetComponent<BlockData>().X = i;
+                            PuzzleData[i, j + k].GetComponent<BlockData>().Y = j;
+
+                            //空白PuzzleDataの空白に見つかったPuzzleDataのブロックを代入
+                            PuzzleData[i, j] = PuzzleData[i, j + k];
+
+                            //空白のPuzzleDataに代入したので代入元のデータをnullにする
+                            PuzzleData[i, j + k] = null;
+
+                            //PuzzleDataのブロックの表示座標を更新する
+                            Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                            PuzzleData[i, j].transform.SetParent(puzzleTransform);
+
+                            //PuzzleData[i, j].GetComponent<Liner>().OnMove(pos, k);
+                            PuzzleData[i, j].GetComponent<Liner>().OnStart(pos, k);
+                            //PuzzleData[i, j].transform.position = pos;
+                            PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+
+                            // 空白PuzzleDataのブロックの上にブロックがないかrowLengthまで調べるのを終了
+                            k = 100;
+
+                        }
+                    }
+
+
+
+                }
+
+            }
+        }
+
+        //地面に到着した猫を探す
+        for (int i = 0; i < columnLength; i++)
+        {
+            if (PuzzleData[i, DeathBlockHeight] != null)
+            {
+                if (PuzzleData[i, DeathBlockHeight].GetComponent<BlockData>().blockType == BlockType.CAT)
+                {
+                    PuzzleData[i, DeathBlockHeight].GetComponent<BlockData>().death = true;
+
+                }
+            }
+        }
+    }
+
+    // 移動中のブロックがないかチェック true:移動中、false:移動中なし
+    public bool CheckBlockMove()
+    {
+        //PuzzleDataが移動中か調べる
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                //空白のPuzzleData以外の時
+                if (PuzzleData[i, j] != null)
+                {
+                    //PuzzleDataが移動中の時
+                    if (PuzzleData[i, j].GetComponent<Liner>().iMove == true)
+                    {
+                        return true;
+                    }
+                }
+
+            }
+        }
+        return false;
+
+    }
+
+    // ステージのブロックを作成
+    public void stageMaker()
+    {
+
+
+
+        //　テキストファイルからデータを読み込む
+        TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
+        textasset = Resources.Load("stage2", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        string TextLines = textasset.text; //テキスト全体をstring型で入れる変数を用意して入れる
+
+        //Splitで一行づつを代入した1次配列を作成
+        textMessage = TextLines.Split('\n'); //
+
+        //行数と列数を取得
+        string[] columstr = textMessage[0].Split(',');
+        columnLength = columstr.Length - 1;
+        rowLength = textMessage.Length;
+
+        // 画面に出すブロックの縦数は最大7にする
+        if (rowLength > 7)
+            DefaultBlockHeight = 7;
+        else
+            DefaultBlockHeight = rowLength;
+
+        // ステージ用のテキストファイルを２次元配列データに格納する用の２次元配列を作成
+        stageData = new string[columnLength, rowLength];
+
+        // stageDataから空き枠以外をMaskDataに格納する用の２次元配列を作成
+        MaskData = new GameObject[columnLength, rowLength];
+
+        // stageDataから英語ブロック、猫などを格納する用の２次元配列を作成 
+        PuzzleData = new GameObject[columnLength, rowLength];
+
+
+        //2次配列を定義
+        textWords = new string[rowLength, columnLength];
+
+        for (int i = 0; i < rowLength; i++)
+        {
+
+            string[] tempWords = textMessage[i].Split(','); //textMessageをカンマごとに分けたものを一時的にtempWordsに代入
+
+            for (int n = 0; n < columnLength; n++)
+            {
+                textWords[i, n] = tempWords[n]; //2次配列textWordsにカンマごとに分けたtempWordsを代入していく
+                Debug.Log(textWords[i, n]);
+            }
+        }
+
+        char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray(); ;
+
+        int k = rowLength - 1;
+        for (int i = 0; i < rowLength; i++)
+        {
+            for (int n = 0; n < columnLength; n++)
+            {
+                string str = textWords[i, n];
+                Debug.Log("x:" + n + "y" + i + "str:" + str);
+                //neko
+                if (str == "*")
+                {
+                    stageData[n, k] = "cat";
+                }
+                //maskなし
+                else if (str == "-")
+                {
+                    stageData[n, k] = "";
+                }
+                //アルファベットランダム
+                else if (str == "#")
+                {
+                    int rand = UnityEngine.Random.Range(0, eigochar.Length);
+                    stageData[n, k] = eigochar[rand].ToString();
+                }
+                //アルファベット
+                else
+                {
+                    stageData[n, k] = str;
+                }
+
+            }
+            k--;
+        }
+
+
+        // stageDataからMaskDataを作成する
+
+
+        // stageDataからMaskDataを作成する
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+
+                //空白の時
+                if (stageData[i, j] != "")
+                {
+
+                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    MaskData[i, j] = Instantiate(MaskPrefab, pos, Quaternion.identity);
+
+                    MaskData[i, j].name = "Mask";
+                    MaskData[i, j].transform.SetParent(puzzleTransform);
+                    MaskData[i, j].transform.localPosition = pos;
+                    MaskData[i, j].transform.localScale = MaskPrefab.transform.localScale;
+
+                }
+            }
+        }
+
+        // stageDataからPuzzleDataを作成する
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+
+                //空白の時
+                if (stageData[i, j] != "")
+                {
+
+                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                    //Vector2 pos = new Vector2(i * BlockSize - 320 + 45 + margin, j * BlockSize - 270);
+
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    PuzzleData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
+                    if (stageData[i, j] == "cat")
+                    {
+                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.CAT, stageData[i, j], false, i, j);
+                        PuzzleData[i, j].name = "Cat"; // GameObjectの名前を決めている
+
+                    }
+                    else
+                    {
+                        PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, stageData[i, j], false, i, j);
+                        PuzzleData[i, j].name = "Block"; // GameObjectの名前を決めている
+                    }
+
+                    // 生成したGameObjectをヒエラルキーに表示
+                    PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                    PuzzleData[i, j].transform.localPosition = pos;
+                    PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+
+                }
+            }
+        }
+
+
+    }
+
+    /// <returns></returns>
 }
