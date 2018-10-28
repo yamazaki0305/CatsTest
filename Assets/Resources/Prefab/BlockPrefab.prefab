@@ -21,8 +21,9 @@ GameObject:
   - component: {fileID: 224921009655630148}
   - component: {fileID: 23557681246414898}
   - component: {fileID: 102885342738506646}
+  - component: {fileID: 114113598763012186}
   m_Layer: 0
-  m_Name: Eigo
+  m_Name: EigoWord
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -126,6 +127,19 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4278190080
+--- !u!114 &114113598763012186
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1335563032091690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c11807f9e754345409353026c2303162, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scalingFlg: 0
+  breakFlg: 0
 --- !u!114 &114754447450229554
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -608,12 +608,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8852c84d0726ab4cb17f9502609a3eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundBlockBreak: {fileID: 0}
-  soundClear: {fileID: 0}
-  soundStar: {fileID: 0}
-  soundTap: {fileID: 0}
-  soundOK: {fileID: 0}
-  soundCancel: {fileID: 0}
   EigoButton: {fileID: 2050965428}
   StatusCat: {fileID: 564731713}
   StatusHand: {fileID: 1719438081}
@@ -2808,7 +2802,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!82 &1861249762
 AudioSource:
   m_ObjectHideFlags: 0

@@ -85,3 +85,8 @@ Xe
 Yb
 Zn
 Zr
+Gu
+si
+Vic
+nu
+xi

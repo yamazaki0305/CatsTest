@@ -147,8 +147,8 @@ public class PuzzleObjectGroup : MonoBehaviour {
                             if (PuzzleData[i, j].GetComponent<BlockData>().alpha < 0)
                             {
                                 GameObject obj = GameObject.Find("GameRoot");
-                                obj.GetComponent<PuzzleMain>().StatusData.Cat--;
-                                obj.GetComponent<PuzzleMain>().StatusUpdate();
+  
+                                obj.GetComponent<PuzzleMain>().StatusData.CatUpdate();
 
                                 // 残り時間が無くなったら自分自身を消滅
                                 GameObject.Destroy(PuzzleData[i, j]);

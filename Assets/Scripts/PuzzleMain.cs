@@ -45,6 +45,36 @@ public class StageStatus
         this.Hand = hand;
         this.Score = 0;
         this.star = 0;
+        StatusUpdate();
+    }
+
+    public void CatUpdate()
+    {
+        this.Cat--;
+        StatusUpdate();
+    }
+    public void HandScoreUpdate(string eigotext)
+    {
+        this.Hand--;
+
+        int s = 10;
+
+        for(int i=0;i<eigotext.Length;i++)
+        {
+            s = s + 10 * i;
+        }
+        this.Score += s;
+        StatusUpdate();
+    }
+    public void StatusUpdate()
+    {
+
+        GameObject StatusCat = GameObject.Find("CatText");
+        StatusCat.GetComponent<Text>().text = "ねこ:" + this.Cat + "匹";
+        GameObject StatusHand = GameObject.Find("HandText");
+        StatusHand.GetComponent<Text>().text = "残り:" + this.Hand + "回";
+        GameObject StatusScore = GameObject.Find("ScoreText");
+        StatusScore.GetComponent<Text>().text = this.Score + "点";
     }
 }
 
@@ -150,12 +180,8 @@ public class StarReword
 public class PuzzleMain : MonoBehaviour
 {
     // SEを所得
-    public AudioClip soundBlockBreak;
-    public AudioClip soundClear;
-    public AudioClip soundStar;
-    public AudioClip soundTap;
-    public AudioClip soundOK;
-    public AudioClip soundCancel;
+    private AudioClip soundTap;
+    private AudioClip soundCancel;
     private AudioSource audioSource;
 
     public GameObject EigoButton;
@@ -208,6 +234,11 @@ public class PuzzleMain : MonoBehaviour
     void Start()
     {
 
+
+        // ステージのクリア条件
+        StatusData = new StageStatus(3, 20);
+        StatusData.StatusUpdate();
+
         //無視英単語リストを設定する
         //　テキストファイルから読み込んだデータ
         TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
@@ -233,8 +264,6 @@ public class PuzzleMain : MonoBehaviour
         GameOverObj.GetComponent<Text>().text = "";
         GameOverObj.SetActive(false);
 
-        StatusData = new StageStatus(3, 10);
-        StatusUpdate();
 
         btnFlg = ButtonFlg.NORMAL;
 
@@ -293,23 +322,23 @@ public class PuzzleMain : MonoBehaviour
 
             JapText.GetComponent<Text>().text = str;
 
-            //スターリワードをチェック
-            StarData.StarCheck(EigoText);
-            EigoText = "";
-            EigoButton.GetComponentInChildren<Text>().text = EigoText;
-
             var button = EigoButton.GetComponent<Button>();
 
-//            if (Input.GetMouseButtonDown(0))
-//            {
-            
-                StartCoroutine(BreakBlockCoroutine());
+            //スターリワードをチェック
+            StarData.StarCheck(EigoText);
+            //            if (Input.GetMouseButtonDown(0))
+            //            {
+
+            StartCoroutine(BreakBlockCoroutine());
 
                 if (isRunning == false)
                 {
-                    StatusData.Score += EigoText.Length * 10;
-                    StatusData.Hand--;
-                    StatusUpdate();
+
+                    StatusData.HandScoreUpdate(EigoText);
+
+                    //英語ボタンの文字を消す
+                    EigoText = "";
+                    EigoButton.GetComponentInChildren<Text>().text = EigoText;
 
                     puzzleObjectGroup.SelectEigoDestroy();
 
@@ -677,10 +706,14 @@ bool EigoJudgement()
         }
     }
 
+    /*
     public void StatusUpdate()
     {
+        StatusData.Score += EigoText.Length * 10;
+        StatusData.Hand--;
         StatusCat.GetComponent<Text>().text = "ねこ:" + StatusData.Cat + "匹";
         StatusHand.GetComponent<Text>().text = "残り:" + StatusData.Hand + "回";
         StatusScore.GetComponent<Text>().text =  StatusData.Score+"点";
     }
+    */
 }
