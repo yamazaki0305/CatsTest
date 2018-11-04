@@ -25,6 +25,7 @@ public enum GameLoopFlg
     PlayNow,    //プレイ中
     Translate, //和訳表示中（ブロックを消す）
     BlockMove,  //ブロック移動中
+    UndderArrow, //地面の下にブロックがある時の処理
     PlayEnd,    //プレイ終了（クリア、ゲームオーバー）
     Pause,      //一時停止中
 }

@@ -20,6 +20,7 @@ public class PuzzleMain : MonoBehaviour
    
     //英語ブロックのサイズを指定
     private int BlockSize = 85;
+    private int MaskSize = 90;
 
     //英語ブロックの1段目の高さ
     private int BlockGroundHeight = -250;
@@ -31,7 +32,10 @@ public class PuzzleMain : MonoBehaviour
     public int DeathBlockHeight = 0;
 
     //プレイヤーがタップ出来るPuzzleDataのマスの高さ
-    public int ActiveBlockHeight = 0;
+    private int ActiveBlockHeight = 0;
+
+    //UnderArrowの残りブロック数
+    private int UnderArrowHeight = 0;
 
     // PuzzleDataをPuzzleObjectGroup下に表示する
     public Transform puzzleTransform;
@@ -112,8 +116,10 @@ public class PuzzleMain : MonoBehaviour
         /// <summary>
         /// PuzzleObjectGroupからコピー
         /// </summary>
-        stageMaker();
+        stageMaker("stage2");
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
+        UnderArrowHeight = ActiveBlockHeight;
+
         /////////////////
 
         // 画面に表示されない縦数を見つける
@@ -162,8 +168,15 @@ public class PuzzleMain : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 画面に表示されない縦数を表示する
-        UnderArrow.GetComponentInChildren<Text>().text = ActiveBlockHeight.ToString();
+        if(UnderArrowHeight==0)
+        {
+            UnderArrow.SetActive(false);
+        }
+        else
+        {
+            // 画面に表示されない縦数を表示する
+            UnderArrow.GetComponentInChildren<Text>().text = UnderArrowHeight.ToString();
+        }
 
         // ゲーム開始前処理
         if (GameFlg == GameLoopFlg.PlayBefore)
@@ -184,7 +197,7 @@ public class PuzzleMain : MonoBehaviour
         else if (GameFlg == GameLoopFlg.Translate)
         {
 
-            
+
             TransWindow.SetActive(true);
 
             Vector2 pos = new Vector2(0, -580);
@@ -218,44 +231,44 @@ public class PuzzleMain : MonoBehaviour
 
             StartCoroutine(BreakBlockCoroutine());
 
-                if (isRunning == false)
-                {
+            if (isRunning == false)
+            {
 
-                    StatusData.HandScoreUpdate(EigoText);
+                StatusData.HandScoreUpdate(EigoText);
 
-                    //英語ボタンの文字を消す
-                    EigoText = "";
-                    EigoButton.GetComponentInChildren<Text>().text = EigoText;
+                //英語ボタンの文字を消す
+                EigoText = "";
+                EigoButton.GetComponentInChildren<Text>().text = EigoText;
 
-                    SelectEigoDestroy();
+                SelectEigoDestroy();
 
-                    btnFlg = ButtonFlg.NORMAL;
+                btnFlg = ButtonFlg.NORMAL;
 
-                    // ブロック移動中処理に移行
-                    GameFlg = GameLoopFlg.BlockMove;
-                    isRunning = true;
+                // ブロック移動中処理に移行
+                GameFlg = GameLoopFlg.BlockMove;
+                isRunning = true;
 
-                    ButtonColorChange(button);
+                ButtonColorChange(button);
 
-                    //ブロックデータリストをクリア
-                    PuzzleDataList.Clear();
+                //ブロックデータリストをクリア
+                PuzzleDataList.Clear();
 
                 return;
-                }
- //           }
+            }
+            //           }
         }
         // ブロック移動中処理
         else if (GameFlg == GameLoopFlg.BlockMove)
         {
             // 救出済ねこがいない時、移動中のブロックがない時
-            if (CheckBlockMove() == false )
+            if (CheckBlockMove() == false)
             {
                 // 和訳の表示をしない
                 TransWindow.SetActive(false);
 
                 if (DeathCat() == false)
                 {
-                    GameFlg = GameLoopFlg.PlayNow;
+                    GameFlg = GameLoopFlg.UndderArrow;
                 }
                 /*
                 audioSource = this.GetComponent<AudioSource>();
@@ -263,6 +276,17 @@ public class PuzzleMain : MonoBehaviour
                 audioSource.Play();
                 */
             }
+        }
+        // 地面の下にブロックがある時の処理
+        else if (GameFlg == GameLoopFlg.UndderArrow)
+        {
+            while (UndderArrowCheck())
+            {
+
+            }
+
+            GameFlg = GameLoopFlg.PlayNow;
+
         }
         // ゲーム中処理
         else if (GameFlg == GameLoopFlg.PlayNow)
@@ -302,7 +326,7 @@ public class PuzzleMain : MonoBehaviour
                             if (!blockData.Selected)
                             {
                                 // プレイヤーがタップできるPuzzleDataのマスの高さ
-                                if (blockData.Y >= ActiveBlockHeight )
+                                if (blockData.Y >= ActiveBlockHeight)
                                 {
                                     audioSource = this.GetComponent<AudioSource>();
                                     audioSource.clip = soundTap;
@@ -374,7 +398,7 @@ public class PuzzleMain : MonoBehaviour
 
             PuzzleDataList[i].GetComponent<SpriteRenderer>().sprite = null;
             PuzzleDataList[i].GetComponentInChildren<TextMesh>().GetComponent<EigoWordController>().breakFlg = true;
-            yield return new WaitForSeconds(0.16f);
+            yield return new WaitForSeconds(0.2f);
 
         }
         
@@ -387,6 +411,12 @@ public class PuzzleMain : MonoBehaviour
         isRunning = false;
     }
 
+    IEnumerator sleep( float f)
+    {
+
+        yield return new WaitForSeconds(f); 
+
+    }
     bool EigoJudgement()
     {
         //英単語になったかの判定(2文字以上の時)
@@ -714,11 +744,10 @@ public class PuzzleMain : MonoBehaviour
         }
 
 
-
         //PuzzleDataの空白を探す
         for (int i = 0; i < columnLength; i++)
         {
-            for (int j = 0; j < rowLength; j++)
+            for (int j = ActiveBlockHeight - UnderArrowHeight; j < rowLength; j++)
             {
                 //PuzzleDataが空白の時
                 if (PuzzleData[i, j] == null && MaskData[i, j] != null)
@@ -742,8 +771,8 @@ public class PuzzleMain : MonoBehaviour
                             PuzzleData[i, j + k] = null;
 
                             //PuzzleDataのブロックの表示座標を更新する
+                            //Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize + (ActiveBlockHeight - UnderArrowHeight) * BlockSize);
                             Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
-
                             PuzzleData[i, j].transform.SetParent(puzzleTransform);
 
                             //PuzzleData[i, j].GetComponent<Liner>().OnMove(pos, k);
@@ -756,13 +785,11 @@ public class PuzzleMain : MonoBehaviour
 
                         }
                     }
-
-
-
                 }
-
             }
         }
+
+
 
         //地面に到着した猫を探す
         for (int i = 0; i < columnLength; i++)
@@ -803,12 +830,12 @@ public class PuzzleMain : MonoBehaviour
     }
 
     // ステージのブロックを作成
-    public void stageMaker()
+    public void stageMaker(string filename)
     {
 
         //　テキストファイルからデータを読み込む
         TextAsset textasset = new TextAsset(); //テキストファイルのデータを取得するインスタンスを作成
-        textasset = Resources.Load("stage2", typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
+        textasset = Resources.Load(filename, typeof(TextAsset)) as TextAsset; //Resourcesフォルダから対象テキストを取得
         string TextLines = textasset.text; //テキスト全体をstring型で入れる変数を用意して入れる
 
         //Splitで一行づつを代入した1次配列を作成
@@ -954,4 +981,100 @@ public class PuzzleMain : MonoBehaviour
     }
 
     /// <returns></returns>
+    
+    public bool UndderArrowCheck()
+    {
+        // 地面の下にブロックがある時
+        if (UnderArrowHeight > 0)
+        {
+            for (int i = 0; i < columnLength; i++)
+            {
+                // 最上部行が全て空いているか確認（Maskのないエリアの場合も空いているカウントする）
+                if (PuzzleData[i, rowLength - 1] != null)
+                {
+                    BlockData blockData = PuzzleData[i, rowLength - 1].GetComponent<BlockData>();
+
+                    //詰まっている列があれば何もしない
+                    if (blockData.blockType == BlockType.ALPHABET || blockData.blockType == BlockType.CAT)
+                    { 
+                        return false;
+                    }
+                }
+            }
+
+            //ここから下に処理が行くときは一番高い列に空きがある時
+
+            //上に移動できる分全ての列を一番高い列が詰まるまで移動。
+            for (int i = 0; i < columnLength; i++)
+            {
+                for (int j = rowLength - 2; j >= 0; j--)
+                {
+                    //もしNULL以外のPuzzleDataのブロックが見つかった時
+                    if (PuzzleData[i, j] != null)
+                    {
+                        //PuzzleData[i, j].GetComponent<BlockData>().X = i;
+                        PuzzleData[i, j].GetComponent<BlockData>().Y = j + 1;
+
+                        PuzzleData[i, j + 1] = PuzzleData[i, j];
+                        PuzzleData[i, j] = null;
+
+                        //PuzzleDataのブロックの表示座標を更新する
+                        Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, (j + 1) * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                        PuzzleData[i, j + 1].transform.SetParent(puzzleTransform);
+
+                        PuzzleData[i, j + 1].GetComponent<Liner>().OnUpper(pos, 1);
+                        PuzzleData[i, j + 1].transform.localScale = puzzlePrefab.transform.localScale;
+                    }
+                    
+                }
+            }
+
+            // MaskはPuzzleDataみたいにX,Yの座標は変えず、位置を上に移動させる
+            for (int i = 0; i < columnLength; i++)
+            {
+                for (int j = 0; j< rowLength; j++)
+                {
+                    //空白の時
+                    if (MaskData[i, j] != null)
+                    {
+                        /*
+                        //PuzzleData[i, j].GetComponent<BlockData>().X = i;
+                        PuzzleData[i, j].GetComponent<BlockData>().Y = j + 1;
+
+                        PuzzleData[i, j + 1] = PuzzleData[i, j];
+                        PuzzleData[i, j] = null;
+                        */
+
+                        //PuzzleDataのブロックの表示座標を更新する
+                        Vector2 pos = new Vector2(MaskData[i, j].transform.localPosition.x, MaskData[i, j].transform.localPosition.y + MaskSize);
+
+                        MaskData[i, j].transform.SetParent(puzzleTransform);
+
+                        MaskData[i, j].GetComponent<Liner>().OnUpper(pos, 1);
+                        //MaskData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+                    }
+
+                }
+            }
+
+            // 残り上の行に移動できる回数をへらす
+            UnderArrowHeight--;
+
+            // ブックを消すPuzzleDataの座標を1つ上げる
+            DeathBlockHeight++;
+
+            //４列が上まで詰まっているか確認（Maskのないエリアの場合も最上部行があいていれば上に行く）
+            // 最上部行が全て空いているか確認（Maskのないエリアの場合も空いているカウントする）
+            //詰まっている列があれば何もしない、
+            //詰まっていない場合は何個上に移動できるか計算（1段ごとの計算でできなくなるまでループさせる）
+            //上に移動できる分全ての列を一番高い列が詰まるまで移動。
+            //列の最大個数より小さい列は移動しない。 
+
+            return true;
+        }
+        else
+            return false;
+
+    }
 }

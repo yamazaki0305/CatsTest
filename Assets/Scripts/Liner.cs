@@ -4,20 +4,11 @@ using System.Collections;
 public class Liner : MonoBehaviour
 {
 
-    [SerializeField, Range(0, 10)]
-    float time;
-
-    [SerializeField]
-    Vector2 endPosition;
-
-    //[SerializeField]
-    //AnimationCurve curve;
-
-    private float startTime;
     private Vector2 startPosition;
 
     public bool iMove = false;
 
+    // ブロックが落ちる時の落ちた位置の座標;toPos、何段落ちるか:k
     public void OnStart(Vector3 toPos, int k)
     {
         iMove = true;
@@ -31,33 +22,33 @@ public class Liner : MonoBehaviour
             def = def * 0.4f;
         }
 
-        /*
-        switch (k)
+        startPosition = transform.localPosition;
+        // この関数を呼び出すとオブジェクトが移動する
+        StartCoroutine(MoveTo(startPosition, toPos, duration,true));
+    }
+
+    // ブロックが上がる時の落ちた位置の座標;toPos、何段上がるか:k
+    public void OnUpper(Vector3 toPos, int k)
+    {
+        iMove = true;
+
+        // 距離によってアニメーションの時間を変化
+        float duration = 0f;
+        float def = 0.4f;
+        for (int i = 0; i < k; i++)
         {
-            case 1:
-                duration = 1f; break;
-            case 2:
-                duration = 1.8f; break;
-            case 3:
-                duration = 2.3f; break;
-            case 4:
-                duration = 3.6f; break;
-            case 5:
-                duration = 3.6f; break;
-            case 6:
-                duration = 4.0f; break;
-            case 7:
-                duration = 4.4f; break;
+            duration += def;
+            def = def * 0.4f;
         }
-        */
 
         startPosition = transform.localPosition;
         // この関数を呼び出すとオブジェクトが移動する
-        StartCoroutine(MoveTo(startPosition, toPos, duration));
+        StartCoroutine(MoveTo(startPosition, toPos, duration,false));
     }
 
+
     // fromPosが移動元の座標、toPosが移動先の座標、durationが移動の秒数
-    IEnumerator MoveTo(Vector3 fromPos, Vector3 toPos, float duration)
+    IEnumerator MoveTo(Vector3 fromPos, Vector3 toPos, float duration,bool drop)
     {
         float time = 0;
 
@@ -70,9 +61,19 @@ public class Liner : MonoBehaviour
                 time = 1;
             }
 
-            float easingValue = EasingLerps.EasingLerp(EasingLerps.EasingLerpsType.Bounce, EasingLerps.EasingInOutType.EaseOut, time, 0, 1);
-            Vector3 lerpValue = Vector3.Lerp(fromPos, toPos, easingValue);
-            this.transform.localPosition = lerpValue;
+            if (drop)
+            {
+                //http://www.noisecrime.com/unity/demos/EasingLibraryVisualisationWebglDemo/index.html
+                float easingValue = EasingLerps.EasingLerp(EasingLerps.EasingLerpsType.Bounce, EasingLerps.EasingInOutType.EaseOut, time, 0, 1);
+                Vector3 lerpValue = Vector3.Lerp(fromPos, toPos, easingValue);
+                this.transform.localPosition = lerpValue;
+            }
+            else
+            {
+                //float easingValue = EasingLerps.EasingLerp(EasingLerps.EasingLerpsType.Bounce, EasingLerps.EasingInOutType.EaseOut, time, 0, 1);
+                Vector3 lerpValue = Vector3.Lerp(fromPos, toPos, time);
+                this.transform.localPosition = lerpValue;
+            }
 
             if (time == 1)
             {
