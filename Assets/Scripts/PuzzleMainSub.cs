@@ -21,11 +21,12 @@ public enum ButtonFlg
 // ゲームループを定義
 public enum GameLoopFlg
 {
-    PlayBefore, //ステージ紹介中
+    StartInfo, //ステージ紹介中
     PlayNow,    //プレイ中
     Translate, //和訳表示中（ブロックを消す）
     BlockMove,  //ブロック移動中
     UndderArrow, //地面の下にブロックがある時の処理
+    PlayBefore, //ゲーム中処理に戻る前の処理
     PlayEnd,    //プレイ終了（クリア、ゲームオーバー）
     Pause,      //一時停止中
 }

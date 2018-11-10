@@ -9,6 +9,7 @@ namespace Example
     {
         private void Start()
         {
+
             // この関数を呼び出すとオブジェクトが移動する
             StartCoroutine(MoveTo(Vector3.zero, Vector3.down, 3));
         }

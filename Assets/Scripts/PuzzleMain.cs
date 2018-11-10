@@ -17,7 +17,7 @@ public class PuzzleMain : MonoBehaviour
     /// <summary>
     /// PuzzleObjectGroupからコピー
     /// </summary>
-   
+
     //英語ブロックのサイズを指定
     private int BlockSize = 85;
     private int MaskSize = 90;
@@ -57,6 +57,8 @@ public class PuzzleMain : MonoBehaviour
     public string[,] textWords; //テキストの複数列を入れる2次元は配列
     private int rowLength; //テキスト内の行数を取得する変数
     private int columnLength; //テキスト内の列数を取得する変数
+
+    private int[] can_alphabet = new int[26]; //A-Zまでパズルエリアに何文字あるか格納する
 
     //////////////////////////////////////////////////////////// 
 
@@ -103,7 +105,7 @@ public class PuzzleMain : MonoBehaviour
     private List<GameObject> PuzzleDataList = new List<GameObject>();
 
     // ゲームループフラグを管理
-    GameLoopFlg GameFlg = GameLoopFlg.PlayBefore;
+    GameLoopFlg GameFlg = GameLoopFlg.StartInfo;
 
     bool isRunning = true;
 
@@ -116,17 +118,20 @@ public class PuzzleMain : MonoBehaviour
         /// <summary>
         /// PuzzleObjectGroupからコピー
         /// </summary>
-        stageMaker("stage2");
+        stageMaker("stage3");
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
         UnderArrowHeight = ActiveBlockHeight;
+
+        // can_alphabetにパズルエリアのアルフェベットを格納
+        CheckPotentialPuzzle();
 
         /////////////////
 
         // 画面に表示されない縦数を見つける
         UnderArrow = GameObject.Find("UnderArrow");
 
-       // ステージのクリア条件
-       StatusData = new StageStatus(3, 20);
+        // ステージのクリア条件
+        StatusData = new StageStatus(3, 20);
         StatusData.StatusUpdate();
 
         //無視英単語リストを設定する
@@ -139,10 +144,10 @@ public class PuzzleMain : MonoBehaviour
         ignore_word = TextLines.Split('\n'); //
 
         //★ミッションの設定
-        StarData = new  StarReword("ANIMAL", "[名]動物", "PEOPLE", "[名]人々", "CHECK", "[動]確認する");
+        StarData = new StarReword("ANIMAL", "[名]動物", "PEOPLE", "[名]人々", "CHECK", "[動]確認する");
 
-       //DBの設定
-       sqlDB = new SqliteDatabase("ejdict.sqlite3");
+        //DBの設定
+        sqlDB = new SqliteDatabase("ejdict.sqlite3");
 
         //GameObjectを探して格納
         TransWindow = GameObject.Find("TransWindow");
@@ -163,12 +168,13 @@ public class PuzzleMain : MonoBehaviour
         // 音声ファイルを設定
         soundTap = Resources.Load("SOUND/SE/cursor1", typeof(AudioClip)) as AudioClip;
 
+        CheckPotentialWords();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(UnderArrowHeight==0)
+        if (UnderArrowHeight == 0)
         {
             UnderArrow.SetActive(false);
         }
@@ -179,7 +185,7 @@ public class PuzzleMain : MonoBehaviour
         }
 
         // ゲーム開始前処理
-        if (GameFlg == GameLoopFlg.PlayBefore)
+        if (GameFlg == GameLoopFlg.StartInfo)
         {
             // スマホのタッチと、PCのクリック判定
             if (Input.GetMouseButtonDown(0))
@@ -285,8 +291,15 @@ public class PuzzleMain : MonoBehaviour
 
             }
 
-            GameFlg = GameLoopFlg.PlayNow;
+            GameFlg = GameLoopFlg.PlayBefore;
 
+        }
+        // ゲーム中処理に戻る前の処理
+        else if (GameFlg == GameLoopFlg.PlayBefore)
+        {
+            // can_alphabetにパズルエリアのアルフェベットを格納
+            CheckPotentialPuzzle();
+            GameFlg = GameLoopFlg.PlayNow;
         }
         // ゲーム中処理
         else if (GameFlg == GameLoopFlg.PlayNow)
@@ -390,9 +403,9 @@ public class PuzzleMain : MonoBehaviour
 
     }
 
-    IEnumerator  BreakBlockCoroutine()
+    IEnumerator BreakBlockCoroutine()
     {
-        
+
         for (int i = 0; i < PuzzleDataList.Count(); i++)
         {
 
@@ -401,7 +414,7 @@ public class PuzzleMain : MonoBehaviour
             yield return new WaitForSeconds(0.2f);
 
         }
-        
+
         for (int i = 0; i < PuzzleDataList.Count(); i++)
         {
             PuzzleDataList[i].SetActive(false);
@@ -411,10 +424,10 @@ public class PuzzleMain : MonoBehaviour
         isRunning = false;
     }
 
-    IEnumerator sleep( float f)
+    IEnumerator sleep(float f)
     {
 
-        yield return new WaitForSeconds(f); 
+        yield return new WaitForSeconds(f);
 
     }
     bool EigoJudgement()
@@ -422,7 +435,7 @@ public class PuzzleMain : MonoBehaviour
         //英単語になったかの判定(2文字以上の時)
         bool judge = false;
         //英単語になったときの単語
-        string eigoword="temp";
+        string eigoword = "temp";
 
         if (EigoText.Length >= 2)
         {
@@ -434,20 +447,17 @@ public class PuzzleMain : MonoBehaviour
             foreach (DataRow dr in dataTable.Rows)
             {
                 judge = true;
- 
+
                 string word = (string)dr["word"];
                 string str = (string)dr["mean"];
 
                 eigoword = word;
 
-                Debug.Log("word:" + word);
-                Debug.Log("mean:" + str);
-
                 TransText += str;
 
             }
 
-            if ( judge == false)
+            if (judge == false)
             {
                 //全て小文字にする
                 string inStr = EigoText.ToLowerInvariant();
@@ -464,7 +474,7 @@ public class PuzzleMain : MonoBehaviour
                     judge = true;
                     string word = (string)dr["word"];
                     string str = (string)dr["mean"];
-                    // attack = (int)dr["attack"];
+
                     eigoword = word;
 
                     TransText += str;
@@ -482,7 +492,6 @@ public class PuzzleMain : MonoBehaviour
                 //Debug.Log("英単語:" + eigoword + "無視:" + ignore_word[i]);
                 if (ignore_word[i].ToString() == eigoword)
                 {
-                    //Debug.Log("false");
                     judge = false;
                 }
             }
@@ -873,11 +882,10 @@ public class PuzzleMain : MonoBehaviour
             for (int n = 0; n < columnLength; n++)
             {
                 textWords[i, n] = tempWords[n]; //2次配列textWordsにカンマごとに分けたtempWordsを代入していく
-                Debug.Log(textWords[i, n]);
             }
         }
 
-        char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray(); ;
+        char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray();
 
         int k = rowLength - 1;
         for (int i = 0; i < rowLength; i++)
@@ -885,7 +893,7 @@ public class PuzzleMain : MonoBehaviour
             for (int n = 0; n < columnLength; n++)
             {
                 string str = textWords[i, n];
-                Debug.Log("x:" + n + "y" + i + "str:" + str);
+
                 //neko
                 if (str == "*")
                 {
@@ -911,10 +919,6 @@ public class PuzzleMain : MonoBehaviour
             }
             k--;
         }
-
-
-        // stageDataからMaskDataを作成する
-
 
         // stageDataからMaskDataを作成する
         for (int i = 0; i < columnLength; i++)
@@ -981,7 +985,7 @@ public class PuzzleMain : MonoBehaviour
     }
 
     /// <returns></returns>
-    
+
     public bool UndderArrowCheck()
     {
         // 地面の下にブロックがある時
@@ -996,15 +1000,13 @@ public class PuzzleMain : MonoBehaviour
 
                     //詰まっている列があれば何もしない
                     if (blockData.blockType == BlockType.ALPHABET || blockData.blockType == BlockType.CAT)
-                    { 
+                    {
                         return false;
                     }
                 }
             }
 
-            //ここから下に処理が行くときは一番高い列に空きがある時
-
-            //上に移動できる分全ての列を一番高い列が詰まるまで移動。
+            //上に移動できる分全ての列を一番高い列が詰まるまで移動
             for (int i = 0; i < columnLength; i++)
             {
                 for (int j = rowLength - 2; j >= 0; j--)
@@ -1026,14 +1028,14 @@ public class PuzzleMain : MonoBehaviour
                         PuzzleData[i, j + 1].GetComponent<Liner>().OnUpper(pos, 1);
                         PuzzleData[i, j + 1].transform.localScale = puzzlePrefab.transform.localScale;
                     }
-                    
+
                 }
             }
 
             // MaskはPuzzleDataみたいにX,Yの座標は変えず、位置を上に移動させる
             for (int i = 0; i < columnLength; i++)
             {
-                for (int j = 0; j< rowLength; j++)
+                for (int j = 0; j < rowLength; j++)
                 {
                     //空白の時
                     if (MaskData[i, j] != null)
@@ -1076,5 +1078,108 @@ public class PuzzleMain : MonoBehaviour
         else
             return false;
 
+    }
+
+    // can_alphabetにパズルエリアのアルフェベットを格納
+    public void CheckPotentialPuzzle()
+    {
+        char[] eigochar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
+        // パズルエリアのアルファベットA-Zまで0を格納する
+        for (int i = 0; i < 26; i++)
+        {
+            can_alphabet[i] = 0;
+        }
+
+        // パズルエリアのアルファベットの数を格納する
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = ActiveBlockHeight; j < rowLength; j++)
+            {
+
+                if (PuzzleData[i, j] != null)
+                {
+                    for (int k = 0; k < 26; k++)
+                    {
+                        char eigo = PuzzleData[i, j].GetComponent<BlockData>().Alphabet[0];
+                        if (eigochar[k] == eigo)
+                        {
+                            can_alphabet[k]++;
+                            k = 100;
+                        }
+                    }
+
+                }
+            }
+        }
+
+        // 現在のアルファベットブロック数をDebugLogに表示
+        for (int i = 0; i < 26; i++)
+        {
+            Debug.Log(eigochar[i] + ":" + can_alphabet[i]);
+        }
+    }
+
+
+    //英単語が作れる可能性をチェック
+    public void CheckPotentialWords()
+    {
+        char[] eigochar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
+        //英単語になったかの判定(2文字以上の時)
+        bool judge = false;
+
+        //string eigo = EigoText.ToLowerInvariant();
+        //select word,mean from items where word like 'check%';
+        //string query = "select word,mean from items where word ='" + eigo + "'";
+        string query = "select word,mean from items where word like 'a%'";
+        DataTable dataTable = sqlDB.ExecuteQuery(query);
+
+        TransText = "";
+        int k = 0;
+        foreach (DataRow dr in dataTable.Rows)
+        {
+            judge = true;
+
+            string word = (string)dr["word"];
+            string str = (string)dr["mean"];
+            word = word.ToUpperInvariant();
+            //Debug.Log("英単語:" + word);
+
+            int []temp_alphabet= new int[26];
+            for (int i = 0; i < 26; i++)
+                temp_alphabet[i] = can_alphabet[i];
+
+            for (int i=0;i<word.Length;i++)
+            {
+                for(int j=0;j<26;j++)
+                {
+                    if(word[i] == eigochar[j])
+                    {
+                        temp_alphabet[j]--;
+                        if (temp_alphabet[j] < 0)
+                            judge = false;
+
+                        break;
+                    }
+                    else if (word[i] == ' ' || word[i] == '.')
+                    {
+                        judge = false;
+                        break;
+                    }
+                }
+                if (judge == false)
+                    break;
+            }
+
+            if (judge)
+            {
+                Debug.Log("英単語:" + word);
+                k++;
+            }
+        }
+
+        Debug.Log("マッチ数:" + k);
+        //Debug.Log("英単語:" + can_alphabet[0]);
     }
 }
