@@ -118,7 +118,7 @@ public class PuzzleMain : MonoBehaviour
         /// <summary>
         /// PuzzleObjectGroupからコピー
         /// </summary>
-        stageMaker("stage3");
+        stageMaker("stage2");
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
         UnderArrowHeight = ActiveBlockHeight;
 
@@ -168,7 +168,6 @@ public class PuzzleMain : MonoBehaviour
         // 音声ファイルを設定
         soundTap = Resources.Load("SOUND/SE/cursor1", typeof(AudioClip)) as AudioClip;
 
-        CheckPotentialWords();
     }
 
     // Update is called once per frame
@@ -203,6 +202,8 @@ public class PuzzleMain : MonoBehaviour
         else if (GameFlg == GameLoopFlg.Translate)
         {
 
+            Text CanWordText = GameObject.Find("CanWordText").GetComponent<Text>();
+            CanWordText.GetComponent<Text>().text = "";
 
             TransWindow.SetActive(true);
 
@@ -299,6 +300,7 @@ public class PuzzleMain : MonoBehaviour
         {
             // can_alphabetにパズルエリアのアルフェベットを格納
             CheckPotentialPuzzle();
+
             GameFlg = GameLoopFlg.PlayNow;
         }
         // ゲーム中処理
@@ -432,6 +434,9 @@ public class PuzzleMain : MonoBehaviour
     }
     bool EigoJudgement()
     {
+        // 英単語が作れるかチェック
+        CheckPotentialWords(EigoText);
+
         //英単語になったかの判定(2文字以上の時)
         bool judge = false;
         //英単語になったときの単語
@@ -467,6 +472,26 @@ public class PuzzleMain : MonoBehaviour
                 string outStr = ti.ToTitleCase(inStr);
 
                 query = "select word,mean from items where word ='" + outStr + "'";
+                dataTable = sqlDB.ExecuteQuery(query);
+                TransText = "";
+                foreach (DataRow dr in dataTable.Rows)
+                {
+                    judge = true;
+                    string word = (string)dr["word"];
+                    string str = (string)dr["mean"];
+
+                    eigoword = word;
+
+                    TransText += str;
+
+                }
+            }
+            if (judge == false)
+            {
+                //全て大文字にする
+                string inStr = EigoText.ToUpperInvariant();
+                
+                query = "select word,mean from items where word ='" + inStr + "'";
                 dataTable = sqlDB.ExecuteQuery(query);
                 TransText = "";
                 foreach (DataRow dr in dataTable.Rows)
@@ -1122,9 +1147,16 @@ public class PuzzleMain : MonoBehaviour
 
 
     //英単語が作れる可能性をチェック
-    public void CheckPotentialWords()
+    public void CheckPotentialWords(string eigostr)
     {
         char[] eigochar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
+        Text CanWordText = GameObject.Find("CanWordText").GetComponent<Text>();
+        if (eigostr.Length < 1)
+        {
+            CanWordText.GetComponent<Text>().text = "";
+            return;
+        }
 
         //英単語になったかの判定(2文字以上の時)
         bool judge = false;
@@ -1132,7 +1164,7 @@ public class PuzzleMain : MonoBehaviour
         //string eigo = EigoText.ToLowerInvariant();
         //select word,mean from items where word like 'check%';
         //string query = "select word,mean from items where word ='" + eigo + "'";
-        string query = "select word,mean from items where word like 'a%'";
+        string query = "select word,mean from items where word like '"+eigostr+"%'";
         DataTable dataTable = sqlDB.ExecuteQuery(query);
 
         TransText = "";
@@ -1143,33 +1175,54 @@ public class PuzzleMain : MonoBehaviour
 
             string word = (string)dr["word"];
             string str = (string)dr["mean"];
-            word = word.ToUpperInvariant();
-            //Debug.Log("英単語:" + word);
 
-            int []temp_alphabet= new int[26];
-            for (int i = 0; i < 26; i++)
-                temp_alphabet[i] = can_alphabet[i];
+            if (word.Length < 2)
+                judge = false;
 
-            for (int i=0;i<word.Length;i++)
+            if (judge)
             {
-                for(int j=0;j<26;j++)
+                //除外リストの単語かチェック
+                for (int i = 0; i < ignore_word.Length; i++)
                 {
-                    if(word[i] == eigochar[j])
-                    {
-                        temp_alphabet[j]--;
-                        if (temp_alphabet[j] < 0)
-                            judge = false;
-
-                        break;
-                    }
-                    else if (word[i] == ' ' || word[i] == '.')
+                    //もし除外リストの単語だったら
+                    if (ignore_word[i].ToString() == word)
                     {
                         judge = false;
                         break;
                     }
                 }
-                if (judge == false)
-                    break;
+            }
+
+            if (judge)
+            {
+                word = word.ToUpperInvariant();
+                //Debug.Log("英単語:" + word);
+
+                int[] temp_alphabet = new int[26];
+                for (int i = 0; i < 26; i++)
+                    temp_alphabet[i] = can_alphabet[i];
+
+                for (int i = 0; i < word.Length; i++)
+                {
+                    for (int j = 0; j < 26; j++)
+                    {
+                        if (word[i] == eigochar[j])
+                        {
+                            temp_alphabet[j]--;
+                            if (temp_alphabet[j] < 0)
+                                judge = false;
+
+                            break;
+                        }
+                        else if (word[i] == ' ' || word[i] == '.' || word[i] == '/')
+                        {
+                            judge = false;
+                            break;
+                        }
+                    }
+                    if (judge == false)
+                        break;
+                }
             }
 
             if (judge)
@@ -1177,9 +1230,19 @@ public class PuzzleMain : MonoBehaviour
                 Debug.Log("英単語:" + word);
                 k++;
             }
+
+            if (k > 50)
+                break;
         }
 
         Debug.Log("マッチ数:" + k);
         //Debug.Log("英単語:" + can_alphabet[0]);
+
+        if(k>50)
+            CanWordText.GetComponent<Text>().text = "50単語以上" ;
+        else if(k>0)
+            CanWordText.GetComponent<Text>().text = k + "単語";
+        else if(k==0)
+            CanWordText.GetComponent<Text>().text = "";
     }
 }

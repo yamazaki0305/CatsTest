@@ -52,7 +52,6 @@ public class EigoWordController : MonoBehaviour {
 
         if (scalingFlg)
         {
-            Debug.Log("sssssssss");
 
             float d = Mathf.Sin(Time.time * this.magSpeed);
             if (d < 0) d = -d;
