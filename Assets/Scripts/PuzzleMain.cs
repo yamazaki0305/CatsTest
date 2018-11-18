@@ -118,7 +118,7 @@ public class PuzzleMain : MonoBehaviour
         /// <summary>
         /// PuzzleObjectGroupからコピー
         /// </summary>
-        stageMaker("stage2");
+        stageMaker("stage3");
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
         UnderArrowHeight = ActiveBlockHeight;
 
@@ -1152,6 +1152,8 @@ public class PuzzleMain : MonoBehaviour
         char[] eigochar = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
 
         Text CanWordText = GameObject.Find("CanWordText").GetComponent<Text>();
+
+        // 英単語が1文字以下の時はCanWordTextを表示しない
         if (eigostr.Length < 1)
         {
             CanWordText.GetComponent<Text>().text = "";
@@ -1161,14 +1163,16 @@ public class PuzzleMain : MonoBehaviour
         //英単語としてカウントするか
         bool judge = false;
 
+        // SQLite3のSQL文を作成　現在の選択中の英単語+%で英単語の可能性のある単語をSelectする
         string query = "select word,mean from items where word like '"+eigostr+"%'";
         DataTable dataTable = sqlDB.ExecuteQuery(query);
 
         TransText = "";
-        int match_count = 0; //何単語作れるか
+        int moutch_count = 0; //何単語作れるか
 
         string lastword=null; // マッチした英語の前回の単語を可能
 
+        // SQL文で見つかった英単語を1つ1つ調べて、judge=trueなら作れる英単語を足す
         foreach (DataRow dr in dataTable.Rows)
         {
             judge = true;
@@ -1182,6 +1186,7 @@ public class PuzzleMain : MonoBehaviour
             if (judge)
             {
 
+                // 前回と同じ英単語は除く（英語辞書データに同じ英単語がある場合があるための処理）
                 if(lastword == word.ToUpperInvariant())
                 {
                     judge = false;
@@ -1204,25 +1209,30 @@ public class PuzzleMain : MonoBehaviour
             if (judge)
             {
                 string tempword = word.ToUpperInvariant();
-                //Debug.Log("英単語:" + word);
 
+
+                // パズル画面中のアルファベット格納数can_alphabetをtemp_alphabetにコピー
                 int[] temp_alphabet = new int[26];
                 for (int i = 0; i < 26; i++)
                     temp_alphabet[i] = can_alphabet[i];
 
+                // 英単語を1文字ずつアルファベットを調べてパズル画面のアルファベット格納数の配列から1つ減らす処理をする
                 for (int i = 0; i < tempword.Length; i++)
                 {
                     for (int j = 0; j < 26; j++)
                     {
+
                         if (tempword[i] == eigochar[j])
                         {
                             temp_alphabet[j]--;
+                            //もしアルファベットの数がマイナスになったらパズル画面中のアルファベットが足りなくなるので、作れる可能性のある英単語ではないと判定
                             if (temp_alphabet[j] < 0)
                                 judge = false;
 
                             break;
                         }
-                        else if (tempword[i] == ' ' || tempword[i] == '.' || tempword[i] == '/'  )
+                        // 英語辞書データにスペースなど2単語の和訳があるのでそういうのは除外（作れる可能性のある英単語ではないと判定
+                        else if (tempword[i] == ' ' || tempword[i] == '.' || tempword[i] == '/' || tempword[i] == '\'' )
                         {
                             judge = false;
                             break;
@@ -1233,25 +1243,28 @@ public class PuzzleMain : MonoBehaviour
                 }
             }
 
+            // 上記処理を通過した英単語は作れる可能性のある英単語と判定する
             if (judge)
             {
                 Debug.Log("英単語:" + word);
                 lastword = word.ToUpperInvariant();
-                match_count++;
+                moutch_count++;
             }
 
-            if (match_count > 50)
+            // 作れる可能性のある英単語が多すぎる場合、処理が重くなるので最大50単語で打ち止めする（foreachからbreak）
+            if (moutch_count > 50)
                 break;
         }
 
-        Debug.Log("マッチ数:" + match_count);
-        //Debug.Log("英単語:" + can_alphabet[0]);
+        Debug.Log("マッチ数:" + moutch_count);
 
-        if(match_count>50)
+
+        // 作れる可能性のある英単語が多すぎる場合、処理が重くなるので最大50単語で打ち止めする
+        if (moutch_count>50)
             CanWordText.GetComponent<Text>().text = "50単語以上" ;
-        else if(match_count>0)
-            CanWordText.GetComponent<Text>().text = match_count + "単語";
-        else if(match_count==0)
+        else if(moutch_count>0)
+            CanWordText.GetComponent<Text>().text = moutch_count + "単語";
+        else if(moutch_count==0)
             CanWordText.GetComponent<Text>().text = "";
     }
 }
