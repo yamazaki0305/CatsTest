@@ -12,6 +12,7 @@ using UnityEngine.SceneManagement;
 using System.Globalization;
 
 
+// Macで書く
 public class PuzzleMain : MonoBehaviour
 {
     /// <summary>
