@@ -26,6 +26,9 @@ public class PuzzleMain : MonoBehaviour
     //英語ブロックの1段目の高さ
     private int BlockGroundHeight = -250;
 
+    //草ラインの高さ
+    private int GlassLineHeight = -280;
+
     //デフォルトの高さのマス
     private int DefaultBlockHeight = 7;
 
@@ -113,13 +116,19 @@ public class PuzzleMain : MonoBehaviour
     // 画面に表示されないブロックの縦数を表示するGameObject
     private GameObject UnderArrow;
 
+    // 猫救出ラインのGlassLineを表示するGameObject
+    private GameObject GlassLine;
+
+    private GameObject BackPicture;
+
+
     void Start()
     {
 
         /// <summary>
         /// PuzzleObjectGroupからコピー
         /// </summary>
-        stageMaker("stage3");
+        stageMaker("stage2");
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
         UnderArrowHeight = ActiveBlockHeight;
 
@@ -130,6 +139,15 @@ public class PuzzleMain : MonoBehaviour
 
         // 画面に表示されない縦数を見つける
         UnderArrow = GameObject.Find("UnderArrow");
+
+        // 猫救出ラインのGlassLineを見つける
+        GlassLine = GameObject.Find("GlassLine");
+        Vector3 pos = new Vector3(0, GlassLineHeight + UnderArrowHeight  * -BlockSize, -1);
+        GlassLine.transform.localPosition = pos;
+
+        BackPicture = GameObject.Find("BackPicture");
+        pos = new Vector3(0, GlassLineHeight + UnderArrowHeight * -BlockSize +500, 100);
+        BackPicture.transform.localPosition = pos;
 
         // ステージのクリア条件
         StatusData = new StageStatus(3, 20);
@@ -1092,6 +1110,13 @@ public class PuzzleMain : MonoBehaviour
             // ブックを消すPuzzleDataの座標を1つ上げる
             DeathBlockHeight++;
 
+            // GlassLineを移動する
+            Vector3 glass_pos = new Vector3(0, GlassLineHeight + UnderArrowHeight * -BlockSize, -1);
+            GlassLine.GetComponent<Liner>().OnUpper(glass_pos, 1);
+
+            Vector3 back_pos = new Vector3(0, GlassLineHeight + UnderArrowHeight * -BlockSize + 500, 100);
+            BackPicture.GetComponent<Liner>().OnUpper(back_pos, 1);
+
             //４列が上まで詰まっているか確認（Maskのないエリアの場合も最上部行があいていれば上に行く）
             // 最上部行が全て空いているか確認（Maskのないエリアの場合も空いているカウントする）
             //詰まっている列があれば何もしない、
@@ -1233,7 +1258,7 @@ public class PuzzleMain : MonoBehaviour
                             break;
                         }
                         // 英語辞書データにスペースなど2単語の和訳があるのでそういうのは除外（作れる可能性のある英単語ではないと判定
-                        else if (tempword[i] == ' ' || tempword[i] == '.' || tempword[i] == '/' || tempword[i] == '\'' )
+                        else if (tempword[i] == ' ' || tempword[i] == '.' || tempword[i] == '/' || tempword[i] == '-' || tempword[i] == '\'' )
                         {
                             judge = false;
                             break;

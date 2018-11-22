@@ -636,14 +636,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.23579672, g: 0.6838235, b: 0.025140554, a: 1}
+  m_Color: {r: 0.9150943, g: 0.9150943, b: 0.9150943, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
     m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
       Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 1a0cf4a835b499c44838469b4533b577, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1383,6 +1383,7 @@ GameObject:
   m_Component:
   - component: {fileID: 848625673}
   - component: {fileID: 848625674}
+  - component: {fileID: 848625675}
   m_Layer: 0
   m_Name: GlassLine
   m_TagString: Untagged
@@ -1397,7 +1398,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 848625672}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -280, z: 0}
+  m_LocalPosition: {x: 0, y: -280, z: -1}
   m_LocalScale: {x: 34, y: 20, z: 1}
   m_Children: []
   m_Father: {fileID: 335742432}
@@ -1449,6 +1450,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &848625675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 848625672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e18648a0499c2f240b18fb85a5cbe1e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iMove: 0
 --- !u!1 &957502033
 GameObject:
   m_ObjectHideFlags: 0
@@ -2230,8 +2243,9 @@ GameObject:
   - component: {fileID: 1521728594}
   - component: {fileID: 1521728595}
   - component: {fileID: 1521728593}
+  - component: {fileID: 1521728596}
   m_Layer: 0
-  m_Name: back
+  m_Name: BackPicture
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2324,17 +2338,29 @@ SpriteRenderer:
   m_SortingLayerID: -936675931
   m_SortingLayer: -2
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: e38de44331d56c545837eeae2301d6dc, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f0ce9386a8cb69d4184a2bf04f098ae7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 8.41, y: 13}
+  m_Size: {x: 8.41, y: 15}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1521728596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1521728591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e18648a0499c2f240b18fb85a5cbe1e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iMove: 0
 --- !u!1 &1597009271
 GameObject:
   m_ObjectHideFlags: 0
@@ -2408,7 +2434,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7058823, g: 0.9634889, b: 1, a: 1}
+  m_Color: {r: 0.7056337, g: 0.9010914, b: 0.9528302, a: 1}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
@@ -3197,7 +3223,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 57857933378e36346a08032a5ca864b1, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.5
+  m_Volume: 0.37
   m_Pitch: 1
   Loop: 1
   Mute: 0
