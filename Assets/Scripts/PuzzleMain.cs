@@ -232,9 +232,6 @@ public class PuzzleMain : MonoBehaviour
             TransWindow.transform.SetParent(trans);
             TransWindow.transform.localPosition = pos;
 
-            Debug.Log("x:" + TransWindow.transform.position.x + "y:" + TransWindow.transform.position.y);
-
-
             Text EngText = GameObject.Find("EngWord").GetComponent<Text>();
             EngText.GetComponent<Text>().text = TransEigoText;
 
@@ -253,8 +250,6 @@ public class PuzzleMain : MonoBehaviour
 
             //スターリワードをチェック
             StarData.StarCheck(EigoText);
-            //            if (Input.GetMouseButtonDown(0))
-            //            {
 
             StartCoroutine(BreakBlockCoroutine());
 
@@ -282,7 +277,7 @@ public class PuzzleMain : MonoBehaviour
 
                 return;
             }
-            //           }
+
         }
         // ブロック移動中処理
         else if (GameFlg == GameLoopFlg.BlockMove)
@@ -295,8 +290,11 @@ public class PuzzleMain : MonoBehaviour
 
                 if (DeathCat() == false)
                 {
-                    GameFlg = GameLoopFlg.UndderArrow;
+                    //SelectEigoDestroy();
+                    if (CheckBlockSpace() == false)
+                        GameFlg = GameLoopFlg.UndderArrow;
                 }
+
                 /*
                 audioSource = this.GetComponent<AudioSource>();
                 audioSource.clip = soundStar;
@@ -839,43 +837,23 @@ public class PuzzleMain : MonoBehaviour
             }
         }
     }
-    //現在選択中の英語ブロックを消す
-    public void SelectEigoDestroy()
+
+    //PuzzleDataの空白を探す
+    public bool CheckBlockSpace()
     {
-        List<BlockData> blockDataList = new List<BlockData>();
-
-
-        for (int i = 0; i < columnLength; i++)
-        {
-            for (int j = 0; j < rowLength; j++)
-            {
-                if (PuzzleData[i, j] != null)
-                {
-                    if (PuzzleData[i, j].GetComponent<BlockData>().EigoFlg)
-                    {
-                        blockDataList.Add(PuzzleData[i, j].GetComponent<BlockData>());
-                        Destroy(PuzzleData[i, j]);
-                        PuzzleData[i, j] = null;
-                        //yield return new WaitForSeconds(0.2f);
-                    }
-
-                }
-
-            }
-        }
-
+        bool b=false;
 
         //PuzzleDataの空白を探す
-        for (int i = 0; i < columnLength; i++)
+        for (int i = 0; i<columnLength; i++)
         {
-            for (int j = ActiveBlockHeight - UnderArrowHeight; j < rowLength; j++)
+            for (int j = ActiveBlockHeight - UnderArrowHeight; j<rowLength; j++)
             {
                 //PuzzleDataが空白の時
                 if (PuzzleData[i, j] == null && MaskData[i, j] != null)
                 {
 
                     //空白PuzzleDataのブロックの上にブロックがないかrowLengthまで調べる
-                    for (int k = 1; j + k < rowLength; k++)
+                    for (int k = 1; j + k<rowLength; k++)
                     {
 
                         //もしNULL以外のPuzzleDataのブロックが見つかった時
@@ -904,16 +882,16 @@ public class PuzzleMain : MonoBehaviour
                             // 空白PuzzleDataのブロックの上にブロックがないかrowLengthまで調べるのを終了
                             k = 100;
 
+                            b = true;
+
                         }
                     }
                 }
             }
         }
 
-
-
         //地面に到着した猫を探す
-        for (int i = 0; i < columnLength; i++)
+        for (int i = 0; i<columnLength; i++)
         {
             if (PuzzleData[i, DeathBlockHeight] != null)
             {
@@ -924,6 +902,36 @@ public class PuzzleMain : MonoBehaviour
                 }
             }
         }
+
+        return b;
+    }
+
+    //現在選択中の英語ブロックを消す
+    public void SelectEigoDestroy()
+    {
+        List<BlockData> blockDataList = new List<BlockData>();
+
+
+        for (int i = 0; i < columnLength; i++)
+        {
+            for (int j = 0; j < rowLength; j++)
+            {
+                if (PuzzleData[i, j] != null)
+                {
+                    if (PuzzleData[i, j].GetComponent<BlockData>().EigoFlg)
+                    {
+                        blockDataList.Add(PuzzleData[i, j].GetComponent<BlockData>());
+                        Destroy(PuzzleData[i, j]);
+                        PuzzleData[i, j] = null;
+                        //yield return new WaitForSeconds(0.2f);
+                    }
+
+                }
+
+            }
+        }
+
+        CheckBlockSpace();
     }
 
     // 移動中のブロックがないかチェック true:移動中、false:移動中なし
