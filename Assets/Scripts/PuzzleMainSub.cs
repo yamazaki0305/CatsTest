@@ -177,3 +177,14 @@ public class StarReword
     }
 
 }
+
+public static class RandomMake
+{
+    public static string alphabet()
+    {
+        char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray();
+        int rand = UnityEngine.Random.Range(0, eigochar.Length);
+        return eigochar[rand].ToString();
+        
+    }
+}

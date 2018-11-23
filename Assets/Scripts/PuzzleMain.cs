@@ -63,6 +63,7 @@ public class PuzzleMain : MonoBehaviour
     private int columnLength; //テキスト内の列数を取得する変数
 
     private int[] can_alphabet = new int[26]; //A-Zまでパズルエリアに何文字あるか格納する
+    private Text CanWordText; // 何単語作れるかのテキストを表示
 
     //////////////////////////////////////////////////////////// 
 
@@ -134,7 +135,8 @@ public class PuzzleMain : MonoBehaviour
 
         // can_alphabetにパズルエリアのアルフェベットを格納
         CheckPotentialPuzzle();
-
+        CanWordText = GameObject.Find("CanWordText").GetComponent<Text>();
+        CanWordText.text = "";
         /////////////////
 
         // 画面に表示されない縦数を見つける
@@ -221,7 +223,6 @@ public class PuzzleMain : MonoBehaviour
         else if (GameFlg == GameLoopFlg.Translate)
         {
 
-            Text CanWordText = GameObject.Find("CanWordText").GetComponent<Text>();
             CanWordText.GetComponent<Text>().text = "";
 
             TransWindow.SetActive(true);
@@ -593,6 +594,7 @@ public class PuzzleMain : MonoBehaviour
     public void PressEigoButton()
     {
         var button = EigoButton.GetComponent<Button>();
+        CanWordText.text = "";
 
         if (btnFlg == ButtonFlg.PRESSED)
         {
@@ -623,6 +625,72 @@ public class PuzzleMain : MonoBehaviour
             GameFlg = GameLoopFlg.Translate;
 
         }
+
+    }
+
+    // 手数を消費してアルファベットブロックを落とす
+    public void DropBlockButton()
+    {
+        bool search = true;
+
+
+
+        // Maskと英語ブロックを参照して空きスペースを探す
+        for (int j = ActiveBlockHeight - UnderArrowHeight; j < rowLength; j++)
+        {
+            // Maskと英語ブロックを参照して空きスペースを探す
+            for (int i = 0; i < columnLength; i++)
+            {
+                //PuzzleDataが空白の時
+                if (PuzzleData[i, j] == null && MaskData[i, j] != null)
+                {
+
+                    search = false;
+
+                    // パズルを落とす位置をセット
+                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, columnLength * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                    // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
+                    PuzzleData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
+
+                    // アルファベットブロックにする
+                    PuzzleData[i, j].GetComponent<BlockData>().setup(BlockType.ALPHABET, RandomMake.alphabet(), false, i, j);
+                    PuzzleData[i, j].name = "Block"; // GameObjectの名前を決めている
+                    PuzzleData[i, j].transform.SetParent(puzzleTransform);
+                    PuzzleData[i, j].transform.localPosition = pos;
+
+                    //アルフェベットブロックの位置をセット
+                    pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+                    PuzzleData[i, j].GetComponent<Liner>().OnUpper(pos, columnLength-j+1);
+                    //PuzzleData[i, j].GetComponent<Liner>().OnStart(pos, k);
+                    //PuzzleData[i, j].transform.position = pos;
+                    //PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
+
+                    //アルファベットブロックを落としたので手数を１つ減らす
+                    StatusData.Hand--;
+                    StatusData.StatusUpdate();
+
+                    //パズルエリアの英語ブロック数を更新
+                    CheckPotentialPuzzle();
+
+                }
+
+                if (!search)
+                    break;
+            }
+            if (!search)
+                break;
+        }
+
+
+        // ActiveBlockHeightから上DefaultBlockHeight(7段)までPuzzleData[,]を参照して空き配列を見る
+        // 空き配列にMaskData[,]を確認しMaskが存在する
+        //アルファベットブロックを落とす
+
+        //空きスペースがない returnする
+        return;
+        //
+        Debug.Log("DropBlock");
 
     }
 
@@ -909,7 +977,7 @@ public class PuzzleMain : MonoBehaviour
         stageData = new string[columnLength, rowLength];
 
         // stageDataから空き枠以外をMaskDataに格納する用の２次元配列を作成
-        MaskData = new GameObject[columnLength, rowLength];
+        MaskData = new GameObject[columnLength, rowLength+1];
 
         // stageDataから英語ブロック、猫などを格納する用の２次元配列を作成 
         PuzzleData = new GameObject[columnLength, rowLength];
@@ -1076,22 +1144,45 @@ public class PuzzleMain : MonoBehaviour
                 }
             }
 
+            for (int i = 0; i < columnLength; i++)
+            {
+                for (int j = rowLength - 1; j >= 0; j--)
+                {
+                    //もしNULL以外のPuzzleDataのブロックが見つかった時
+                    if (MaskData[i, j] != null)
+                    {
+                        //PuzzleData[i, j].GetComponent<BlockData>().X = i;
+                        //PuzzleData[i, j].GetComponent<BlockData>().Y = j + 1;
+
+                        MaskData[i, j + 1] = MaskData[i, j];
+                        MaskData[i, j] = null;
+
+                        //PuzzleDataのブロックの表示座標を更新する
+                        Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, (j + 1) * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+
+                        MaskData[i, j + 1].transform.localScale = MaskPrefab.transform.localScale;
+                        MaskData[i, j + 1].transform.SetParent(puzzleTransform);
+                        MaskData[i, j + 1].GetComponent<Liner>().OnUpper(pos, 1);
+                    }
+
+                }
+            }
+
+            /*
             // MaskはPuzzleDataみたいにX,Yの座標は変えず、位置を上に移動させる
             for (int i = 0; i < columnLength; i++)
             {
                 for (int j = 0; j < rowLength; j++)
                 {
                     //空白の時
-                    if (MaskData[i, j] != null)
+                    if (MaskData[i, j] == null)
                     {
-                        /*
-                        //PuzzleData[i, j].GetComponent<BlockData>().X = i;
-                        PuzzleData[i, j].GetComponent<BlockData>().Y = j + 1;
-
-                        PuzzleData[i, j + 1] = PuzzleData[i, j];
-                        PuzzleData[i, j] = null;
-                        */
-
+                        if (j - 1 > 0)
+                            if (MaskData[i, j - 1] != null)
+                                MaskData[i, j] = new GameObject(); // 空のGameObjectを入れる
+                    }
+                    else
+                    {
                         //PuzzleDataのブロックの表示座標を更新する
                         Vector2 pos = new Vector2(MaskData[i, j].transform.localPosition.x, MaskData[i, j].transform.localPosition.y + MaskSize);
 
@@ -1103,6 +1194,7 @@ public class PuzzleMain : MonoBehaviour
 
                 }
             }
+            */
 
             // 残り上の行に移動できる回数をへらす
             UnderArrowHeight--;
