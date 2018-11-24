@@ -127,9 +127,22 @@ public class PuzzleMain : MonoBehaviour
     {
 
         /// <summary>
-        /// PuzzleObjectGroupからコピー
-        /// </summary>
-        stageMaker("stage2");
+        /// StageFileの読み込み
+        string filename = "stage"+SampleData.SceneNo.ToString();
+        stageMaker(filename);
+        Text StageNoText = GameObject.Find("StageNoText").GetComponent<Text>();
+        StageNoText.text = "Stage " + SampleData.SceneNo.ToString();
+
+        // ステージのクリア条件
+        if (SampleData.SceneNo==1)
+            StatusData = new StageStatus(2, 10);
+        else if (SampleData.SceneNo == 2)
+            StatusData = new StageStatus(3, 15);
+        else if (SampleData.SceneNo == 3)
+            StatusData = new StageStatus(3, 20);
+
+        StatusData.StatusUpdate();
+
         ActiveBlockHeight = rowLength - DefaultBlockHeight;
         UnderArrowHeight = ActiveBlockHeight;
 
@@ -150,10 +163,6 @@ public class PuzzleMain : MonoBehaviour
         BackPicture = GameObject.Find("BackPicture");
         pos = new Vector3(0, GlassLineHeight + UnderArrowHeight * -BlockSize +500, 100);
         BackPicture.transform.localPosition = pos;
-
-        // ステージのクリア条件
-        StatusData = new StageStatus(3, 20);
-        StatusData.StatusUpdate();
 
         //無視英単語リストを設定する
         //　テキストファイルから読み込んだデータ
@@ -328,7 +337,7 @@ public class PuzzleMain : MonoBehaviour
             //ゲームクリア判定
             if (StatusData.Cat == 0)
             {
-                GameOverObj.GetComponent<Text>().text = "GameClear!!";
+                GameOverObj.GetComponent<Text>().text = "GameClear!!\n次のステージへ";
                 GameOverObj.SetActive(true);
 
             }
@@ -587,6 +596,10 @@ public class PuzzleMain : MonoBehaviour
 
     public void ReloadButton()
     {
+        SampleData.SceneNo++;
+        if (SampleData.SceneNo > 3)
+            SampleData.SceneNo = 1;
+
         SceneManager.LoadScene("PuzzleGame");
     }
     public void PressEigoButton()
@@ -643,10 +656,12 @@ public class PuzzleMain : MonoBehaviour
                 if (PuzzleData[i, j] == null && MaskData[i, j] != null)
                 {
 
+                    Debug.Log("sssssss");
                     search = false;
 
                     // パズルを落とす位置をセット
-                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, columnLength * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
+                    //Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, 1500);
+                    Vector2 pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, rowLength * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
 
                     // スクリプトからインスタンス（動的にゲームオブジェクトを指定数だけ作る
                     PuzzleData[i, j] = Instantiate(puzzlePrefab, pos, Quaternion.identity);
@@ -657,9 +672,10 @@ public class PuzzleMain : MonoBehaviour
                     PuzzleData[i, j].transform.SetParent(puzzleTransform);
                     PuzzleData[i, j].transform.localPosition = pos;
 
+                    Debug.Log("columnLength" + (columnLength) + "j"+j);
                     //アルフェベットブロックの位置をセット
                     pos = new Vector2(i * BlockSize - (BlockSize * columnLength) / 2 + BlockSize / 2, j * BlockSize + BlockGroundHeight - (rowLength - DefaultBlockHeight) * BlockSize);
-                    PuzzleData[i, j].GetComponent<Liner>().OnUpper(pos, columnLength-j+1);
+                    PuzzleData[i, j].GetComponent<Liner>().OnUpper(pos, rowLength-j+1);
                     //PuzzleData[i, j].GetComponent<Liner>().OnStart(pos, k);
                     //PuzzleData[i, j].transform.position = pos;
                     //PuzzleData[i, j].transform.localScale = puzzlePrefab.transform.localScale;
@@ -1005,7 +1021,7 @@ public class PuzzleMain : MonoBehaviour
             }
         }
 
-        char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray();
+        //char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray();
 
         int k = rowLength - 1;
         for (int i = 0; i < rowLength; i++)
@@ -1026,9 +1042,8 @@ public class PuzzleMain : MonoBehaviour
                 }
                 //アルファベットランダム
                 else if (str == "#")
-                {
-                    int rand = UnityEngine.Random.Range(0, eigochar.Length);
-                    stageData[n, k] = eigochar[rand].ToString();
+                { 
+                stageData[n, k] = RandomMake.alphabet();
                 }
                 //アルファベット
                 else
@@ -1378,7 +1393,7 @@ public class PuzzleMain : MonoBehaviour
             }
 
             // 作れる可能性のある英単語が多すぎる場合、処理が重くなるので最大50単語で打ち止めする（foreachからbreak）
-            if (moutch_count > 50)
+            if (moutch_count > 30)
                 break;
         }
 
@@ -1386,8 +1401,8 @@ public class PuzzleMain : MonoBehaviour
 
 
         // 作れる可能性のある英単語が多すぎる場合、処理が重くなるので最大50単語で打ち止めする
-        if (moutch_count>50)
-            CanWordText.GetComponent<Text>().text = "50単語以上" ;
+        if (moutch_count>30)
+            CanWordText.GetComponent<Text>().text = "30単語以上" ;
         else if(moutch_count>0)
             CanWordText.GetComponent<Text>().text = moutch_count + "単語";
         else if(moutch_count==0)

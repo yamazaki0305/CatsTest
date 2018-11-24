@@ -182,9 +182,17 @@ public static class RandomMake
 {
     public static string alphabet()
     {
-        char[] eigochar = "AAAAAABBCCCDDDEEEEEEFFGGGHHHIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUVWWXYYYZ".ToCharArray();
+        char[] eigochar = "AAAAAAAAAAAABBCCCDDDEEEEEEEEEEEEFFGGGHHHIIIIIIIIIIJKKKLLLMMMNNNOOOOPPQRRRSSSTTTUUUUUUUUVWWXYYYZ".ToCharArray();
         int rand = UnityEngine.Random.Range(0, eigochar.Length);
         return eigochar[rand].ToString();
         
     }
+
+}
+
+public class SampleData : ScriptableObject
+{
+
+    public static int SceneNo = 1;
+
 }
