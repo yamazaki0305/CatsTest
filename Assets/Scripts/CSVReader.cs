@@ -10,8 +10,8 @@ public class CSVReader : MonoBehaviour {
 
     void Start()
     {
-        csvFile = Resources.Load("testCSV") as TextAsset; // Resouces下のCSV読み込み
-        //csvFile = Resources.Load("stagedata") as TextAsset; // Resouces下のCSV読み込み
+        //csvFile = Resources.Load("testCSV") as TextAsset; // Resouces下のCSV読み込み
+        csvFile = Resources.Load("stagedata") as TextAsset; // Resouces下のCSV読み込み
         StringReader reader = new StringReader(csvFile.text);
 
         // , で分割しつつ一行ずつ読み込み
@@ -24,7 +24,7 @@ public class CSVReader : MonoBehaviour {
         }
 
         // csvDatas[行][列]を指定して値を自由に取り出せる
-        Debug.Log(csvDatas[0][1]); 
+        Debug.Log(csvDatas[0][0]); 
 
     }
 
