@@ -11,6 +11,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using System.Globalization;
 
+//コミットを取り消す
 
 // Macで書く
 public class PuzzleMain : MonoBehaviour
@@ -122,10 +123,11 @@ public class PuzzleMain : MonoBehaviour
 
     private GameObject BackPicture;
 
-
     void Start()
     {
+        
 
+       
         /// <summary>
         /// StageFileの読み込み
         string filename = "stage"+SampleData.SceneNo.ToString();
