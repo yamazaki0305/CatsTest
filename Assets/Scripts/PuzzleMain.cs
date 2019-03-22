@@ -123,6 +123,8 @@ public class PuzzleMain : MonoBehaviour
 
     private GameObject BackPicture;
 
+    private bool InAd = true;
+
     void Start()
     {
         
@@ -339,6 +341,13 @@ public class PuzzleMain : MonoBehaviour
             //ゲームクリア判定
             if (StatusData.Cat == 0)
             {
+                // インステンシル広告を表示
+                if (InAd)
+                {
+                    GameObject.Find("GameRoot").GetComponent<AdInterstitial>().ShowInterstitial();
+                    InAd = false;
+                }
+
                 GameOverObj.GetComponent<Text>().text = "GameClear!!\n次のステージへ";
                 GameOverObj.SetActive(true);
 
@@ -1284,7 +1293,7 @@ public class PuzzleMain : MonoBehaviour
         // 現在のアルファベットブロック数をDebugLogに表示
         for (int i = 0; i < 26; i++)
         {
-            Debug.Log(eigochar[i] + ":" + can_alphabet[i]);
+            //Debug.Log(eigochar[i] + ":" + can_alphabet[i]);
         }
     }
 
@@ -1389,7 +1398,7 @@ public class PuzzleMain : MonoBehaviour
             // 上記処理を通過した英単語は作れる可能性のある英単語と判定する
             if (judge)
             {
-                Debug.Log("英単語:" + word);
+                //Debug.Log("英単語:" + word);
                 lastword = word.ToUpperInvariant();
                 moutch_count++;
             }
@@ -1399,7 +1408,7 @@ public class PuzzleMain : MonoBehaviour
                 break;
         }
 
-        Debug.Log("マッチ数:" + moutch_count);
+        //Debug.Log("マッチ数:" + moutch_count);
 
 
         // 作れる可能性のある英単語が多すぎる場合、処理が重くなるので最大50単語で打ち止めする

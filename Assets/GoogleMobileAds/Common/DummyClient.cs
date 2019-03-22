@@ -25,7 +25,7 @@ namespace GoogleMobileAds.Common
     {
         public DummyClient()
         {
-            Debug.Log("Dummy " + MethodBase.GetCurrentMethod().Name);
+            //Debug.Log("Dummy " + MethodBase.GetCurrentMethod().Name);
         }
 
         // Disable warnings for unused dummy ad events.

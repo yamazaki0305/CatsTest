@@ -120,7 +120,7 @@ public class StarReword
         }
 
         StarText.GetComponent<Text>().text = starJaptext;
-        Debug.Log(starJaptext);
+        //Debug.Log(starJaptext);
 
         StarObjStar[0] = GameObject.Find("StarObj0/Star");
         StarObjStar[0].SetActive(false);

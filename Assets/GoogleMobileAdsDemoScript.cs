@@ -8,9 +8,9 @@ public class GoogleMobileAdsDemoScript : MonoBehaviour
     public void Start()
     {
 #if UNITY_ANDROID
-        string appId = "ca-app-pub-4228179100830730~2084688814";
+        string appId = "ca-app-pub-4228179100830730~2084688814"; //NekotanAndroid Admob AppID
 #elif UNITY_IPHONE
-            string appId = "ca-app-pub-3940256099942544~1458002511";
+        string appId = "ca-app-pub-4228179100830730~9684855854";//NekotaniPhone Admob AppID
 #else
             string appId = "unexpected_platform";
 #endif

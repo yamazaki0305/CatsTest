@@ -8,13 +8,30 @@ public class AdReward : MonoBehaviour {
 
     private RewardBasedVideoAd rewardBasedVideo;
 
+    bool IsRewarded = false;
+    bool IsClosed = false;
+
+    void Update()
+    {
+        if (IsRewarded && IsClosed)
+        {
+            IsRewarded = false;
+            IsClosed = false;
+
+            //ここで報酬を与える処理を実行
+            GameObject.Find("GameRoot").GetComponent<PuzzleMain>().StatusData.Hand += 10;
+            GameObject.Find("GameRoot").GetComponent<PuzzleMain>().StatusData.StatusUpdate();
+
+        }
+    }
+
     public void Start()
     {
 
 #if UNITY_ANDROID
-        string appId = "ca-app-pub-3940256099942544~3347511713";
+        string appId = "ca-app-pub-4228179100830730~2084688814"; //NekotanAndroid Admob AppID
 #elif UNITY_IPHONE
-            string appId = "ca-app-pub-3940256099942544~1458002511";
+        string appId = "ca-app-pub-4228179100830730~9684855854";//NekotaniPhone Admob AppID
 #else
             string appId = "unexpected_platform";
 #endif
@@ -45,13 +62,15 @@ public class AdReward : MonoBehaviour {
         
     }
 
+
     private void RequestRewardBasedVideo()
     {
 #if UNITY_ANDROID
         //string adUnitId = "ca-app-pub-4228179100830730/6265931815";//正しい
         string adUnitId = "ca-app-pub-3940256099942544/5224354917"; //サンプル
 #elif UNITY_IPHONE
-            string adUnitId = "ca-app-pub-3940256099942544/1712485313";
+        //string adUnitId = "ca-app-pub-4228179100830730/8343854021";//正しい
+        string adUnitId = "ca-app-pub-3940256099942544/1712485313";//サンプル
 #else
             string adUnitId = "unexpected_platform";
 #endif
@@ -88,6 +107,7 @@ public class AdReward : MonoBehaviour {
     {
         this.RequestRewardBasedVideo();
         MonoBehaviour.print("HandleRewardBasedVideoClosed event received");
+        IsClosed = true;
     }
 
     public void HandleRewardBasedVideoRewarded(object sender, Reward args)
@@ -97,6 +117,10 @@ public class AdReward : MonoBehaviour {
         MonoBehaviour.print(
             "HandleRewardBasedVideoRewarded event received for "
                         + amount.ToString() + " " + type);
+
+        IsRewarded = true;
+
+
     }
 
     public void HandleRewardBasedVideoLeftApplication(object sender, EventArgs args)
@@ -108,7 +132,14 @@ public class AdReward : MonoBehaviour {
     {
         if (rewardBasedVideo.IsLoaded())
         {
+#if UNITY_EDITOR
+            IsRewarded = true;
+            IsClosed = true;
             rewardBasedVideo.Show();
+# else
+            rewardBasedVideo.Show();
+#endif
+
         }
     }
    
